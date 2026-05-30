@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>⚡ 案件衝刺排行</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100vh;font-family:'Segoe UI',sans-serif;background:linear-gradient(160deg,#0d0830 0%,#0d0d1f 40%,#0b1a0e 100%);background-attachment:fixed;color:#eee;overflow-x:hidden}
+:root{--bg:#0d0d1f;--s1:#14142e;--gold:#ffd700;--ora:#f7971e;--txt:#eee;--mut:#9988bb;--red:#ff4466;--grn:#44ffaa;--border:rgba(255,255,255,.1)}
+
+/* ── SCREENS ── */
+#titleScreen{display:block;min-height:100vh;background:transparent}
+#gameScreen{display:none;min-height:100vh}
+#gameScreen.on{display:block}
+
+/* ── TITLE ── */
+.tglow{font-size:clamp(1.8em,5vw,3em);font-weight:900;background:linear-gradient(135deg,#f7971e,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;padding:36px 20px 6px}
+.tsub{text-align:center;color:var(--mut);letter-spacing:3px;font-size:.8em;margin-bottom:26px;text-transform:uppercase}
+.rpanel{max-width:520px;margin:0 auto;padding:0 16px 40px}
+.box{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:14px}
+.box h3{color:var(--ora);font-size:.9em;font-weight:700;margin-bottom:15px}
+.fl{display:block;font-size:.73em;color:var(--mut);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+.fi{width:100%;padding:10px 13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:9px;color:#eee;font-size:.95em;outline:none;-webkit-user-select:text;user-select:text}
+.fi:focus{border-color:var(--ora)}
+.fgroup{margin-bottom:12px}
+.btn{padding:10px 20px;border:none;border-radius:26px;font-size:.88em;font-weight:700;cursor:pointer;transition:all .2s;touch-action:manipulation}
+.bm{background:linear-gradient(135deg,var(--ora),var(--gold));color:#1a0a00}
+.bm:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.bg{background:rgba(255,255,255,.08);color:#eee;border:1px solid rgba(255,255,255,.15)}
+.bg:hover{background:rgba(255,255,255,.14)}
+.bsm{padding:7px 14px;font-size:.78em}
+.bdel{background:linear-gradient(135deg,#c0392b,#922b21);color:#fff}
+
+/* ── AVATAR UPLOAD ── */
+.avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px}
+.avatar-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--ora);background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:2.2em;cursor:pointer;overflow:hidden}
+.avatar-preview img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.avatar-label{font-size:.75em;color:var(--mut)}
+#avatarInput{display:none}
+
+/* ── GAME TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:rgba(0,0,0,.5);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;position:sticky;top:0;z-index:50}
+.pbadge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);padding:5px 12px;border-radius:20px}
+.pbadge-avatar{width:28px;height:28px;border-radius:50%;object-fit:cover;border:2px solid var(--ora);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.9em;flex-shrink:0;overflow:hidden}
+.pbadge-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.tabs{display:flex;gap:5px;flex-wrap:wrap}
+.tab{padding:6px 13px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:18px;cursor:pointer;font-size:.76em;transition:all .18s;touch-action:manipulation;white-space:nowrap}
+.tab.on{background:linear-gradient(135deg,var(--ora),var(--gold));color:#1a0a00;border-color:transparent;font-weight:700}
+
+/* ── MAIN CONTENT ── */
+.main{padding:20px 16px;max-width:900px;margin:0 auto}
+.pane{display:none}.pane.on{display:block}
+
+/* ── KING BANNER ── */
+.king-banner{position:relative;border-radius:24px;overflow:hidden;margin-bottom:28px;min-height:360px;
+  background:#060318;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px 28px;text-align:center;gap:10px;
+  box-shadow:0 0 0 1.5px rgba(255,215,0,.35),0 0 40px rgba(255,215,0,.12),0 0 80px rgba(130,60,255,.15),0 20px 60px rgba(0,0,0,.5)}
+.king-banner::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,215,0,.18) 0%,transparent 55%),
+             radial-gradient(ellipse at 15% 100%,rgba(130,60,255,.18) 0%,transparent 50%),
+             radial-gradient(ellipse at 85% 100%,rgba(0,200,255,.14) 0%,transparent 50%);
+  pointer-events:none}
+.king-banner::after{content:'';position:absolute;inset:0;border-radius:24px;
+  background:linear-gradient(90deg,
+    rgba(255,215,0,0) 0%,rgba(255,215,0,.25) 20%,rgba(180,80,255,.2) 40%,
+    rgba(0,200,255,.2) 60%,rgba(255,100,180,.18) 80%,rgba(255,215,0,0) 100%) border-box;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:destination-out;mask-composite:exclude;
+  animation:borderFlow 4s linear infinite;pointer-events:none}
+@keyframes borderFlow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+.king-confetti{position:absolute;inset:0;pointer-events:none}
+.king-avatar-ring{position:relative;display:inline-block}
+.king-avatar-ring::before{content:'';position:absolute;inset:-14px;border-radius:50%;
+  background:conic-gradient(from 0deg,#ffd700,#e040fb,#00bcd4,#ffd700);
+  animation:ringSpin 3s linear infinite;filter:blur(3px);opacity:.8}
+.king-avatar-ring::after{content:'';position:absolute;inset:-8px;border-radius:50%;
+  background:conic-gradient(from 180deg,#ffd700,transparent,#ffd700);
+  animation:ringSpin 2s linear infinite reverse}
+@keyframes ringSpin{to{transform:rotate(360deg)}}
+@keyframes ringPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.1)}}
+.king-avatar{width:120px;height:120px;border-radius:50%;object-fit:cover;border:4px solid #fff;
+  display:block;background:#1a0a3a;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  position:relative;z-index:2;box-shadow:0 0 0 4px rgba(255,215,0,.4),0 0 30px rgba(255,215,0,.3)}
+.king-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.king-crown{font-size:2.4em;filter:drop-shadow(0 0 12px rgba(255,215,0,.8));animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.king-name{font-size:clamp(1.4em,4vw,2em);font-weight:900;
+  background:linear-gradient(135deg,#ffe066 0%,#fff 40%,#ffd700 60%,#ffb700 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 18px rgba(255,215,0,.7)) drop-shadow(0 2px 8px rgba(0,0,0,.5));
+  letter-spacing:1px;text-transform:uppercase}
+.king-score{font-size:.95em;color:rgba(255,255,255,.8)}
+.king-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.star-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.aurora{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.aurora::before{content:'';position:absolute;width:200%;height:200%;top:-50%;left:-50%;
+  background:conic-gradient(from 0deg at 50% 50%,rgba(255,215,0,0) 0%,rgba(130,60,255,.08) 15%,rgba(0,180,255,.1) 30%,rgba(255,215,0,.08) 45%,rgba(255,60,130,.07) 60%,rgba(130,60,255,.08) 75%,rgba(0,180,255,.06) 90%,rgba(255,215,0,0) 100%);
+  animation:auroraRot 18s linear infinite}
+@keyframes auroraRot{to{transform:rotate(360deg)}}
+
+/* ── PROGRESS RINGS ── */
+.players-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.player-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:16px;padding:16px;text-align:center;transition:border-color .2s}
+.player-card:hover{border-color:rgba(247,151,30,.4)}
+.pc-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 auto 10px;border:3px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:1.8em;overflow:hidden}
+.pc-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.pc-name{font-weight:700;font-size:.93em;margin-bottom:3px}
+.pc-sub{font-size:.72em;color:var(--mut)}
+.pc-prog-wrap{margin:10px 0 6px;position:relative;height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden}
+.pc-prog-fill{height:100%;border-radius:4px;transition:width 1s}
+
+/* ── DAILY INPUT ── */
+.daily-wrap{max-width:560px}
+.irow{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.ibox{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:13px}
+.ibox label{display:block;font-size:.72em;color:var(--mut);margin-bottom:7px}
+.wh{font-size:.68em;color:var(--ora)}
+.numctrl{display:flex;align-items:stretch;border:1px solid rgba(255,255,255,.17);border-radius:9px;overflow:hidden}
+.numctrl button{background:rgba(255,255,255,.09);border:none;color:#eee;font-size:1.4em;font-weight:700;padding:7px 13px;cursor:pointer;touch-action:manipulation;flex-shrink:0;line-height:1}
+.numctrl button:hover{background:rgba(247,151,30,.3);color:var(--ora)}
+.numctrl input{flex:1;min-width:0;background:rgba(255,255,255,.06);border:none;border-left:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.12);color:#eee;font-size:1.45em;font-weight:700;text-align:center;padding:7px 4px;outline:none;-webkit-appearance:none;appearance:none;-webkit-user-select:text;user-select:text;touch-action:manipulation}
+.numctrl input:focus{background:rgba(247,151,30,.1)}
+.leave-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:11px;flex-wrap:wrap}
+.leave-row label{font-size:.78em;color:var(--mut);white-space:nowrap}
+.leave-input{display:flex;align-items:stretch;border:1px solid rgba(255,255,255,.17);border-radius:9px;overflow:hidden;width:130px;flex-shrink:0}
+.leave-input button{background:rgba(255,255,255,.09);border:none;color:#eee;font-size:1.3em;font-weight:700;padding:6px 11px;cursor:pointer;line-height:1}
+.leave-input button:hover{background:rgba(247,151,30,.3)}
+.leave-input input{flex:1;background:rgba(255,255,255,.06);border:none;border-left:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.12);color:#eee;font-size:1.1em;font-weight:700;text-align:center;padding:6px 3px;outline:none;-webkit-appearance:none;-webkit-user-select:text;user-select:text}
+.leave-hint{font-size:.72em;color:var(--mut);flex-shrink:0}
+
+/* ── STATS ── */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.scard{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:15px;padding:16px;cursor:pointer;transition:border-color .2s}
+.scard:hover{border-color:rgba(247,151,30,.4)}
+.scard-header{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+.scard-av{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:1.3em;flex-shrink:0;overflow:hidden}
+.scard-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.brow{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.bl{width:36px;font-size:.7em;color:var(--mut);text-align:right;flex-shrink:0}
+.bbar{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.bval{width:30px;font-size:.7em;color:var(--ora);text-align:right;flex-shrink:0}
+.progbar{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin:5px 0 3px}
+.progfill{height:100%;border-radius:3px;transition:width .8s}
+
+/* ── LB ── */
+.lbw{max-width:680px}
+.lbr{display:flex;align-items:center;gap:11px;padding:11px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:7px}
+.lbrank{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82em;background:rgba(255,255,255,.08);flex-shrink:0}
+.lb-av{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:1.1em;flex-shrink:0;overflow:hidden}
+.lb-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* ── TITLES ── */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:11px}
+.tcard{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:13px;padding:18px;text-align:center}
+.title-av{width:60px;height:60px;border-radius:50%;margin:8px auto 6px;border:3px solid var(--gold);background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:1.7em;overflow:hidden}
+.title-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* ── PENTA MODAL ── */
+#pm{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:600;display:none;align-items:center;justify-content:center}
+#pm.on{display:flex}
+.pmb{background:#13132a;border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:24px;text-align:center;max-width:300px;width:92%}
+#pm-av{width:60px;height:60px;border-radius:50%;border:3px solid var(--gold);background:rgba(255,255,255,.1);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.6em;overflow:hidden}
+#pm-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* ── LOG TABLE ── */
+.lt{width:100%;border-collapse:collapse;font-size:.82em}
+.lt th{color:var(--mut);text-align:left;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.08)}
+.lt td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(14,14,35,.96);border:1px solid rgba(255,255,255,.15);border-radius:13px;padding:10px 20px;font-size:.87em;z-index:9999;display:none;white-space:nowrap;max-width:90vw;text-align:center}
+
+/* ── STONE CANVAS ── */
+#sc{position:fixed;inset:0;pointer-events:none;z-index:800;display:none}
+
+/* ── SECTION TITLES ── */
+.sec-title{color:var(--ora);font-size:1em;font-weight:700;margin-bottom:14px}
+.sec-sub{font-size:.75em;color:var(--mut);font-weight:400}
+
+/* ── MISC ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* ── SPARKLE BG ── */
+#sparkleCanvas{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55}
+.main{position:relative;z-index:1}
+.topbar{position:sticky;top:0;z-index:50}
+#titleScreen{position:relative;z-index:1}
+.rpanel{position:relative;z-index:1}
+
+/* ── ENHANCED PLAYER CARD ── */
+.player-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:16px;padding:16px;text-align:center;transition:all .25s;backdrop-filter:blur(4px)}
+.player-card:hover{border-color:rgba(247,151,30,.5);transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+
+/* ── ENHANCED CARDS ── */
+.scard{backdrop-filter:blur(4px)}
+.lbr{backdrop-filter:blur(4px)}
+.box{backdrop-filter:blur(4px)}
+
+/* ── PENTAGON WARRIOR OVERLAY ── */
+#warriorOverlay{position:fixed;inset:0;z-index:1000;pointer-events:none;display:none}
+#warriorOverlay canvas{position:absolute;inset:0;width:100%;height:100%}
+.warrior-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);text-align:center;pointer-events:none}
+.warrior-title-big{font-size:clamp(2em,8vw,4em);font-weight:900;
+  background:linear-gradient(135deg,#ffd700 0%,#fff 40%,#e040fb 70%,#00bcd4 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 30px rgba(255,215,0,.8));
+  animation:warriorPulse 1.2s ease-in-out infinite alternate;
+  text-shadow:none;white-space:nowrap}
+@keyframes warriorPulse{from{letter-spacing:2px;opacity:.9}to{letter-spacing:6px;opacity:1}}
+.warrior-sub{font-size:clamp(1em,3vw,1.5em);color:rgba(255,255,255,.9);margin-top:8px;
+  animation:float 2s ease-in-out infinite}
+</style>
+</head>
+<body>
+<canvas id="sparkleCanvas"></canvas>
+<canvas id="sc"></canvas>
+<div id="warriorOverlay">
+  <canvas id="warriorCanvas"></canvas>
+  <div class="warrior-text">
+    <div class="warrior-title-big">⭐ 五邊形戰士 ⭐</div>
+    <div class="warrior-sub">全能滿貫！傳說誕生！</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════ TITLE SCREEN ═══════════════════ -->
+<div id="titleScreen">
+  <div class="tglow">⚡ 案件衝刺</div>
+  <div class="tsub">Monthly Case Sprint Challenge</div>
+  <div class="rpanel">
+
+    <div class="box">
+      <h3>🆕 新增角色</h3>
+      <!-- Avatar upload -->
+      <div class="avatar-wrap">
+        <div class="avatar-preview" id="regAvatarPreview" onclick="document.getElementById('avatarInput').click()">📷</div>
+        <span class="avatar-label">點擊上傳頭貼（選填）</span>
+        <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(event)">
+      </div>
+      <div class="fgroup"><label class="fl">員工編號（6碼）</label><input class="fi" id="rEmp" maxlength="6" placeholder="例：A12345" autocomplete="off"></div>
+      <div class="fgroup"><label class="fl">角色名稱</label><input class="fi" id="rName" placeholder="輸入你的稱號" autocomplete="off"></div>
+      <div class="fgroup"><label class="fl">目標月平均案件量（加權後，每工作日）</label><input class="fi" id="rTarget" type="number" min="1" placeholder="例：20" inputmode="decimal"></div>
+      <div style="text-align:right;margin-top:4px"><button class="btn bm" onclick="doReg()">加入衝刺 ⚡</button></div>
+    </div>
+
+    <div class="box">
+      <h3>🔑 已有角色？登入</h3>
+      <div style="display:flex;gap:9px">
+        <input class="fi" id="lEmp" maxlength="6" placeholder="輸入6碼員工編號" style="flex:1" autocomplete="off">
+        <button class="btn bg" onclick="doLogin()">登入</button>
+      </div>
+    </div>
+
+    <div class="box" id="epanel" style="display:none">
+      <h3>👥 目前參賽者</h3>
+      <div id="elist"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ GAME SCREEN ═══════════════════ -->
+<div id="gameScreen">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+      <div class="pbadge">
+        <div class="pbadge-avatar" id="tbAv">👤</div>
+        <span id="tbname" style="font-weight:700"></span>
+        <span id="tbprog" style="color:var(--gold);font-size:.82em"></span>
+      </div>
+      <span id="tbmo" style="color:var(--mut);font-size:.78em"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <div class="tabs">
+        <div class="tab on" onclick="switchTab('home')">🏠 主頁</div>
+        <div class="tab" onclick="switchTab('daily')">📝 輸入</div>
+        <div class="tab" onclick="switchTab('stats')">📊 統計</div>
+        <div class="tab" onclick="switchTab('lb')">🏆 排行</div>
+        <div class="tab" onclick="switchTab('titles')">👑 稱號</div>
+        <div class="tab" onclick="switchTab('vote')">💖 投票</div>
+      </div>
+      <button class="btn bg bsm" onclick="doLogout()">登出</button>
+      <button class="btn bsm" onclick="openDeleteModal()" style="background:rgba(255,60,60,.15);color:#ff8888;border:1px solid rgba(255,60,60,.3);" title="刪除我的角色">🗑️</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- HOME -->
+    <div class="pane on" id="p-home">
+      <!-- King Banner -->
+      <div class="king-banner" id="kingBanner">
+        <canvas id="kingBgCanvas" style="position:absolute;inset:0;width:100%;height:100%;border-radius:20px;pointer-events:none;object-fit:cover"></canvas>
+        <div class="aurora"></div><div class="star-bg" id="starBg"></div>
+        <div class="king-crown" id="kingCrown">👑</div><div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);font-size:1.4em;filter:blur(8px);opacity:.6;animation:float 3s ease-in-out infinite">👑</div>
+        <div class="king-avatar-ring">
+          <div class="king-avatar" id="kingAv">🏆</div>
+        </div>
+        <div class="king-name" id="kingName">—</div>
+        <div class="king-score" id="kingScore">尚無資料</div>
+        <div class="king-badges" id="kingBadges"></div>
+      </div>
+      <!-- Titles mini row -->
+      <div id="titlesRow" style="display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap"></div>
+
+      <!-- Section header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div class="sec-title" style="margin-bottom:0">📊 本月進度總覽</div>
+        <div id="charmLeftDisplay" style="font-size:.82em;color:#e91e63;background:rgba(233,30,99,.1);border:1px solid rgba(233,30,99,.25);border-radius:14px;padding:5px 12px"></div>
+      </div>
+      <div class="players-grid" id="playersGrid"></div>
+      <div class="sec-title" style="margin-top:8px">💖 本月魅力排行</div>
+      <div id="charmBoard" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px"></div>
+    </div>
+
+    <!-- DAILY -->
+    <div class="pane" id="p-daily">
+      <div class="daily-wrap">
+        <div class="sec-title">📅 今日案件輸入 <span class="sec-sub" id="ddlabel"></span></div>
+        <div id="already" style="display:none;background:rgba(68,255,136,.07);border:1px solid rgba(68,255,136,.22);border-radius:9px;padding:9px 13px;margin-bottom:12px;font-size:.83em;color:var(--grn)">✅ 今日已輸入，可更新修改</div>
+        <div class="irow">
+          <div class="ibox"><label>結案 <span class="wh">×1.0</span></label>
+            <div class="numctrl"><button type="button" onclick="adj('ija',-1)">−</button><input id="ija" type="number" min="0" value="0" inputmode="numeric" oninput="updDW()"><button type="button" onclick="adj('ija',1)">＋</button></div></div>
+          <div class="ibox"><label>緩議 <span class="wh">×0.8</span></label>
+            <div class="numctrl"><button type="button" onclick="adj('ihy',-1)">−</button><input id="ihy" type="number" min="0" value="0" inputmode="numeric" oninput="updDW()"><button type="button" onclick="adj('ihy',1)">＋</button></div></div>
+          <div class="ibox"><label>授變 <span class="wh">×0.6</span></label>
+            <div class="numctrl"><button type="button" onclick="adj('isb',-1)">−</button><input id="isb" type="number" min="0" value="0" inputmode="numeric" oninput="updDW()"><button type="button" onclick="adj('isb',1)">＋</button></div></div>
+          <div class="ibox"><label>塗銷 <span class="wh">×0.6</span></label>
+            <div class="numctrl"><button type="button" onclick="adj('itx',-1)">−</button><input id="itx" type="number" min="0" value="0" inputmode="numeric" oninput="updDW()"><button type="button" onclick="adj('itx',1)">＋</button></div></div>
+        </div>
+        <!-- Leave input -->
+        <div class="leave-row">
+          <label>🏖️ 今日請假時數</label>
+          <div class="leave-input">
+            <button type="button" onclick="adjLeave(-1)">−</button>
+            <input id="ileave" type="number" min="0" max="8" value="0" inputmode="numeric" oninput="updDW()">
+            <button type="button" onclick="adjLeave(1)">＋</button>
+          </div>
+          <span class="leave-hint">小時（÷8＝天）</span>
+          <span id="leaveDays" style="font-size:.8em;color:var(--gold);font-weight:700"></span>
+        </div>
+        <div id="dwsum" style="color:var(--mut);font-size:.83em;margin-bottom:4px"></div>
+        <div id="adjTarget" style="color:var(--grn);font-size:.8em;margin-bottom:13px"></div>
+        <button class="btn bm" onclick="submitDaily()">儲存今日記錄 ✓</button>
+
+        <div style="margin-top:20px;background:rgba(255,255,255,.03);border-radius:13px;padding:14px">
+          <h4 style="color:var(--ora);margin-bottom:10px">本月記錄</h4>
+          <div style="overflow-x:auto"><table class="lt">
+            <thead><tr><th>日期</th><th>結案</th><th>緩議</th><th>授變</th><th>塗銷</th><th>請假h</th><th>加權</th></tr></thead>
+            <tbody id="logbody"></tbody>
+          </table></div>
+          <div id="logsum" style="margin-top:10px;font-size:.82em;color:var(--mut)"></div>
+        </div>
+        <div style="margin-top:16px;padding:14px;background:rgba(255,60,60,.06);border:1px solid rgba(255,60,60,.18);border-radius:12px">
+          <h4 style="color:var(--red);margin-bottom:8px">⚠️ 刪除我的角色</h4>
+          <p style="font-size:.8em;color:var(--mut);margin-bottom:9px">刪除後資料永久消失。</p>
+          <button class="btn bdel bsm" onclick="deleteMyChar()">刪除角色</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="pane" id="p-stats">
+      <div class="sec-title">📊 統計 <span class="sec-sub">(點擊看能力五邊形)</span></div>
+      <div class="sgrid" id="sgrid"></div>
+    </div>
+
+    <!-- LB -->
+    <div class="pane" id="p-lb">
+      <div class="sec-title">🏆 本月排行榜</div>
+      <div class="lbw" id="lbw"></div>
+    </div>
+
+    <!-- TITLES -->
+    <div class="pane" id="p-titles">
+      <div class="sec-title">👑 本月稱號</div>
+      <div class="tgrid" id="tgrid"></div>
+    </div>
+
+    <!-- VOTE -->
+    <div class="pane" id="p-vote">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+        <div class="sec-title" style="margin-bottom:0">💖 魅力投票</div>
+        <div id="voteCharmLeft" style="font-size:.85em;color:#e91e63;background:rgba(233,30,99,.1);border:1px solid rgba(233,30,99,.25);border-radius:14px;padding:6px 14px;font-weight:700"></div>
+      </div>
+      <div id="voteGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px"></div>
+      <div class="sec-title" style="margin-bottom:12px">📊 本月魅力排行</div>
+      <div id="voteBoard" style="display:flex;flex-direction:column;gap:8px;max-width:500px"></div>
+    </div>
+
+  </div><!-- /.main -->
+</div><!-- /#gameScreen -->
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" style="position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:700;display:none;align-items:center;justify-content:center">
+  <div style="background:#1a0a1a;border:2px solid rgba(255,60,60,.35);border-radius:20px;padding:28px;max-width:360px;width:90%;text-align:center">
+    <div style="font-size:2.5em;margin-bottom:12px">🗑️</div>
+    <h3 style="color:#ff6666;margin-bottom:10px;font-size:1.05em">刪除角色</h3>
+    <p style="font-size:.85em;color:var(--mut);margin-bottom:6px">確定要刪除 <span id="delName" style="color:#eee;font-weight:700"></span> 嗎？</p>
+    <p style="font-size:.78em;color:rgba(255,100,100,.7);margin-bottom:20px">⚠️ 所有資料將永久消失，無法恢復</p>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn bg bsm" onclick="document.getElementById('deleteModal').style.display='none'">取消</button>
+      <button class="btn bdel bsm" onclick="confirmDelete()">確定刪除</button>
+    </div>
+  </div>
+</div>
+
+<!-- PENTA MODAL -->
+<div id="pm">
+  <div class="pmb">
+    <div id="pm-av">👤</div>
+    <h3 id="pmtitle" style="color:var(--ora);margin-bottom:12px;font-size:.93em"></h3>
+    <canvas id="pmc" width="200" height="200"></canvas>
+    <div id="pmlabels" style="margin-top:9px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;font-size:.75em"></div>
+    <button class="btn bg bsm" style="margin-top:12px" onclick="document.getElementById('pm').classList.remove('on')">關閉</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA & HELPERS
+// ═══════════════════════════════════════════════
+const TW_HOLIDAYS=new Set(['2025-01-01','2025-01-27','2025-01-28','2025-01-29','2025-01-30','2025-01-31','2025-02-28','2025-04-04','2025-04-05','2025-05-01','2025-05-02','2025-06-09','2025-09-13','2025-10-10','2026-01-01','2026-01-29','2026-01-30','2026-01-31','2026-02-06','2026-02-28','2026-04-04','2026-05-01','2026-06-20','2026-09-26','2026-10-10']);
+const today=new Date();
+const YM=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
+const TODAY=today.toISOString().split('T')[0];
+
+function isWD(d){const dw=new Date(d+'T00:00:00').getDay();return dw!==0&&dw!==6&&!TW_HOLIDAYS.has(d)}
+function getWD(y,m){const r=[];const d=new Date(y,m-1,1);while(d.getMonth()===m-1){const s=d.toISOString().split('T')[0];if(isWD(s))r.push(s);d.setDate(d.getDate()+1)}return r}
+function getWDSF(y,m){return getWD(y,m).filter(d=>d<=TODAY)}
+
+function cW(r){return(r.ja||0)*1+(r.hy||0)*.8+(r.sb||0)*.6+(r.tx||0)*.6}
+
+function save(){try{localStorage.setItem('cs1',JSON.stringify(state))}catch(e){}}
+function load(){try{const d=localStorage.getItem('cs1');if(d)state=JSON.parse(d)}catch(e){}}
+
+let state={players:{}};
+let me=null;
+let pendingAvatar=null; // base64 for new reg
+
+// BroadcastChannel for multi-tab
+let bc;
+try{bc=new BroadcastChannel('cs1bc')}catch(e){}
+function bcast(t,d){if(bc)try{bc.postMessage({type:t,data:d,from:me})}catch(e){}}
+if(bc)bc.onmessage=evt=>{
+  const{type,data,from}=evt.data;if(from===me)return;
+  load();
+  if(type==='join'||type==='update'){
+    if(!state.players[from])state.players[from]=data.p;
+    else Object.assign(state.players[from],data.p);
+    save();renderExisting();
+    if(me)refreshCurrentTab();
+  }
+  if(type==='delete'){delete state.players[from];save();if(me)refreshCurrentTab();}
+  if(type==='stone'){
+    const p=state.players[from];
+    if(data.target===me){bumpPlayer(me);showToast(`💖 ${p?p.name:'某人'} 投了魅力票給你！`,'danger');}
+    playStone(from,data.target);
+  }
+};
+
+// ═══════════════════════════════════════════════
+// AVATAR
+// ═══════════════════════════════════════════════
+function handleAvatarUpload(evt){
+  const file=evt.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    pendingAvatar=e.target.result;
+    const prev=document.getElementById('regAvatarPreview');
+    prev.innerHTML=`<img src="${pendingAvatar}" alt="avatar">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function makeAvEl(avData,size=38){
+  const wrap=document.createElement('div');
+  wrap.style.cssText=`width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(255,255,255,.08)`;
+  if(avData){const img=document.createElement('img');img.src=avData;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';wrap.appendChild(img);}
+  else{wrap.textContent='👤';}
+  return wrap;
+}
+
+// ═══════════════════════════════════════════════
+// PROGRESS CALC
+// ═══════════════════════════════════════════════
+function getMonthTotal(p){
+  const l=p.logs&&p.logs[YM];if(!l)return 0;
+  return Object.values(l).reduce((s,r)=>s+cW(r),0);
+}
+
+function getTotalLeaveHours(p){
+  const l=p.logs&&p.logs[YM];if(!l)return 0;
+  return Object.values(l).reduce((s,r)=>s+(r.leave||0),0);
+}
+
+// Effective working days: total workdays in month minus leave days (leave hrs / 8)
+function getEffectiveWD(p){
+  const wdAll=getWD(today.getFullYear(),today.getMonth()+1).length;
+  const leaveDays=getTotalLeaveHours(p)/8;
+  return Math.max(0, wdAll - leaveDays);
+}
+
+function getAdjTarget(p){
+  // Target per day * effective working days
+  return p.target * getEffectiveWD(p);
+}
+
+function getProgress(p){
+  const t=getAdjTarget(p);if(!t)return 0;
+  return Math.min(1,getMonthTotal(p)/t);
+}
+
+// ═══════════════════════════════════════════════
+// REGISTER / LOGIN
+// ═══════════════════════════════════════════════
+function doReg(){
+  const empId=document.getElementById('rEmp').value.trim();
+  const name=document.getElementById('rName').value.trim();
+  const target=parseFloat(document.getElementById('rTarget').value)||0;
+  if(empId.length!==6){showToast('員工編號需6碼','danger');return}
+  if(!name){showToast('請輸入名稱','danger');return}
+  if(target<=0){showToast('請輸入目標案件量','danger');return}
+  if(state.players[empId]){showToast('此員工編號已存在','danger');return}
+  const colors=['#f7971e','#3498db','#9b59b6','#27ae60','#e74c3c','#f39c12','#1abc9c','#e91e63'];
+  const col=colors[Object.keys(state.players).length%colors.length];
+  state.players[empId]={empId,name,color:col,avatar:pendingAvatar||null,target,logs:{},medals:[],throwReceived:{},reachedGoal:null};
+  save();me=empId;pendingAvatar=null;
+  bcast('join',{p:state.players[empId]});
+  enterGame();
+}
+
+function doLogin(){
+  const empId=document.getElementById('lEmp').value.trim();
+  if(!state.players[empId]){showToast('找不到此員工編號','danger');return}
+  me=empId;enterGame();
+}
+
+function doLogout(){
+  me=null;
+  document.getElementById('gameScreen').classList.remove('on');
+  document.getElementById('titleScreen').style.display='block';
+  renderExisting();
+}
+
+function renderExisting(){
+  const pl=Object.values(state.players);
+  const ep=document.getElementById('epanel');
+  if(!pl.length){ep.style.display='none';return}
+  ep.style.display='block';
+  const el=document.getElementById('elist');el.innerHTML='';
+  pl.forEach(p=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)';
+    const av=makeAvEl(p.avatar,32);av.style.border='2px solid '+(p.color||'#f7971e');
+    const info=document.createElement('div');
+    info.innerHTML=`<div style="font-weight:700;font-size:.88em">${p.name}</div><div style="font-size:.72em;color:var(--mut)">${p.empId}</div>`;
+    row.appendChild(av);row.appendChild(info);el.appendChild(row);
+  });
+}
+
+function enterGame(){
+  document.getElementById('titleScreen').style.display='none';
+  document.getElementById('gameScreen').classList.add('on');
+  const p=state.players[me];
+  document.getElementById('tbname').textContent=p.name;
+  document.getElementById('tbmo').textContent=`${today.getFullYear()}年${today.getMonth()+1}月`;
+  // Topbar avatar
+  const tbAv=document.getElementById('tbAv');
+  if(p.avatar){tbAv.innerHTML=`<img src="${p.avatar}" alt="av">`;}else{tbAv.textContent='👤';}
+  checkReset();
+  switchTab('home');
+}
+
+// ═══════════════════════════════════════════════
+// KING BANNER
+// ═══════════════════════════════════════════════
+const CONFETTI_CHARS=['🌟','✨','🎊','🎉','💫','⭐','🌈','🎈'];
+function renderVoteTab(){
+  // Update left count
+  const left=getCharmLeft();
+  const lvEl=document.getElementById('voteCharmLeft');
+  if(lvEl) lvEl.textContent=`今日剩餘 ${left} 票`;
+
+  // Vote grid - all players
+  const grid=document.getElementById('voteGrid');
+  if(!grid)return;
+  grid.innerHTML='';
+  const players=Object.values(state.players);
+
+  players.forEach(p=>{
+    const charmCount=(p.throwReceived&&p.throwReceived[YM])||0;
+    const isSelf=p.empId===me;
+    const card=document.createElement('div');
+    card.style.cssText='background:rgba(255,255,255,.04);border:1px solid rgba(233,30,99,.18);border-radius:16px;padding:16px;text-align:center;transition:all .2s';
+
+    const av=makeAvEl(p.avatar,72);
+    av.style.cssText+=`;margin:0 auto 10px;border:3px solid ${p.color||'#e91e63'}`;
+
+    const info=document.createElement('div');
+    const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
+    info.innerHTML=`
+      <div style="font-weight:700;font-size:.95em;margin-bottom:3px">${p.name} ${medals}</div>
+      <div style="font-size:.78em;color:#e91e63;margin-bottom:10px">💖 ${charmCount} 票</div>
+      <button onclick="doCharm('${p.empId}',event)"
+        style="background:${left<=0?'rgba(100,100,100,.3)':'linear-gradient(135deg,#e91e63,#c2185b)'};
+        border:none;border-radius:16px;color:${left<=0?'#888':'#fff'};font-size:.85em;font-weight:700;
+        padding:8px 20px;cursor:${left<=0?'not-allowed':'pointer'};touch-action:manipulation;width:100%"
+        ${left<=0?'disabled':''}>
+        ${isSelf?'投給自己 💖':'投票 💖'}
+      </button>`;
+
+    card.appendChild(av);
+    card.appendChild(info);
+    grid.appendChild(card);
+  });
+
+  // Vote leaderboard
+  const board=document.getElementById('voteBoard');
+  if(!board)return;
+  board.innerHTML='';
+  const sorted=players.slice()
+    .map(p=>({p,v:(p.throwReceived&&p.throwReceived[YM])||0}))
+    .sort((a,b)=>b.v-a.v);
+
+  if(!sorted.some(x=>x.v>0)){
+    board.innerHTML='<div style="color:var(--mut);font-size:.85em;padding:12px 0">本月尚無投票記錄</div>';
+    return;
+  }
+
+  const maxV=sorted[0].v||1;
+  sorted.forEach(({p,v},i)=>{
+    if(v===0&&i>2)return;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(233,30,99,.06);border:1px solid rgba(233,30,99,.15);border-radius:12px;padding:10px 14px';
+    const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;
+    const av=makeAvEl(p.avatar,36);av.style.border=`2px solid ${p.color||'#e91e63'}`;
+    const info=document.createElement('div');info.style.flex='1';
+    info.innerHTML=`<div style="font-weight:700;font-size:.88em">${rank} ${p.name}</div>
+      <div style="height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-top:4px">
+        <div style="width:${Math.round(v/maxV*100)}%;height:100%;background:linear-gradient(90deg,#e91e63,#ff6090);border-radius:3px;transition:width .8s"></div>
+      </div>`;
+    const cnt=document.createElement('div');
+    cnt.style.cssText='color:#e91e63;font-weight:700;font-size:1em;flex-shrink:0';
+    cnt.textContent=`💖 ${v}`;
+    row.appendChild(av);row.appendChild(info);row.appendChild(cnt);
+    board.appendChild(row);
+  });
+}
+
+function renderTitlesRow(){
+  const tr=document.getElementById('titlesRow');if(!tr)return;
+  tr.innerHTML='';
+  const players=Object.values(state.players);
+  if(!players.length)return;
+
+  // Find each title holder
+  let jaBest={p:null,v:0},hyBest={p:null,v:0},thrBest={p:null,v:0};
+  players.forEach(p=>{
+    const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0;
+    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;});
+    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
+    if(ja>jaBest.v)jaBest={p,v:ja};
+    if(hy>hyBest.v)hyBest={p,v:hy};
+    if(thr>thrBest.v)thrBest={p,v:thr};
+  });
+
+  // Pentagon warriors
+  const warriors=getPentagonWarriors();
+
+  const items=[
+    {icon:'⚡',label:'結案王',best:jaBest,unit:'件',grad:'linear-gradient(135deg,#f7971e,#ffd200)',glow:'rgba(247,151,30,.35)'},
+    {icon:'🌊',label:'緩議王',best:hyBest,unit:'件',grad:'linear-gradient(135deg,#0072ff,#00c6ff)',glow:'rgba(0,180,255,.35)'},
+    {icon:'💖',label:'人氣王',best:thrBest,unit:'票',grad:'linear-gradient(135deg,#e91e63,#ff6090)',glow:'rgba(233,30,99,.35)'},
+  ];
+
+  items.forEach(({icon,label,best,unit,grad,glow})=>{
+    const card=document.createElement('div');
+    card.style.cssText=`flex:1;min-width:120px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 12px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s;box-shadow:0 0 20px ${glow}`;
+    card.onmouseenter=()=>card.style.transform='translateY(-3px)';
+    card.onmouseleave=()=>card.style.transform='';
+
+    // Gradient glow top
+    const glowDiv=document.createElement('div');
+    glowDiv.style.cssText=`position:absolute;top:0;left:0;right:0;height:3px;background:${grad};border-radius:16px 16px 0 0`;
+    card.appendChild(glowDiv);
+
+    if(best.p){
+      const av=makeAvEl(best.p.avatar,52);
+      av.style.cssText+=`;margin:4px auto 8px;border:3px solid transparent;background:${grad};box-shadow:0 0 12px ${glow}`;
+      // Wrap to clip
+      const avWrap=document.createElement('div');
+      avWrap.style.cssText='width:52px;height:52px;border-radius:50%;margin:4px auto 8px;overflow:hidden;position:relative';
+      if(best.p.avatar){const img=document.createElement('img');img.src=best.p.avatar;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';avWrap.appendChild(img);}
+      else{avWrap.style.background='rgba(255,255,255,.08)';avWrap.style.display='flex';avWrap.style.alignItems='center';avWrap.style.justifyContent='center';avWrap.textContent='👤';}
+      avWrap.style.border=`3px solid transparent`;
+      avWrap.style.backgroundImage=grad;
+      card.appendChild(avWrap);
+      const nameEl=document.createElement('div');
+      nameEl.style.cssText='font-weight:700;font-size:.88em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+      nameEl.textContent=best.p.name;
+      const valEl=document.createElement('div');
+      valEl.style.cssText=`font-size:.75em;background:${grad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700`;
+      valEl.textContent=`${best.v} ${unit}`;
+      const lblEl=document.createElement('div');
+      lblEl.style.cssText='font-size:.7em;color:var(--mut);margin-bottom:2px';
+      lblEl.innerHTML=`${icon} ${label}`;
+      card.appendChild(lblEl);card.appendChild(nameEl);card.appendChild(valEl);
+    } else {
+      card.innerHTML+=`<div style="font-size:1.6em;margin:6px 0">${icon}</div><div style="font-size:.8em;font-weight:700;margin-bottom:4px">${label}</div><div style="font-size:.72em;color:var(--mut)">暫無</div>`;
+    }
+    tr.appendChild(card);
+  });
+
+  // Pentagon warrior card
+  if(warriors.length>0){
+    const wCard=document.createElement('div');
+    wCard.style.cssText='flex:1;min-width:120px;border-radius:16px;padding:14px 12px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s;background:linear-gradient(135deg,#0a0520,#1a0540);box-shadow:0 0 30px rgba(255,215,0,.25),0 0 60px rgba(180,60,255,.2)';
+    wCard.onmouseenter=()=>wCard.style.transform='translateY(-3px)';
+    wCard.onmouseleave=()=>wCard.style.transform='';
+    // Rainbow border top
+    const rb=document.createElement('div');
+    rb.style.cssText='position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ffd700,#e040fb,#00bcd4,#ffd700);animation:borderFlow 2s linear infinite;border-radius:16px 16px 0 0';
+    wCard.appendChild(rb);
+    const star=document.createElement('div');star.style.cssText='font-size:1.6em;margin:4px 0 6px;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 8px #ffd700)';star.textContent='⭐';
+    wCard.appendChild(star);
+    const lbl=document.createElement('div');lbl.style.cssText='font-size:.72em;color:#ffd700;margin-bottom:6px;font-weight:700';lbl.textContent='五邊形戰士';
+    wCard.appendChild(lbl);
+    warriors.forEach(w=>{
+      const avWrap=document.createElement('div');
+      avWrap.style.cssText='width:48px;height:48px;border-radius:50%;margin:2px auto 4px;overflow:hidden;border:2px solid #ffd700;box-shadow:0 0 10px rgba(255,215,0,.5)';
+      if(w.avatar){const img=document.createElement('img');img.src=w.avatar;img.style.cssText='width:100%;height:100%;object-fit:cover';avWrap.appendChild(img);}
+      else{avWrap.style.background='rgba(255,255,255,.08)';avWrap.style.display='flex';avWrap.style.alignItems='center';avWrap.style.justifyContent='center';avWrap.textContent='👤';}
+      const nm=document.createElement('div');nm.style.cssText='font-size:.75em;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';nm.textContent=w.name;
+      wCard.appendChild(avWrap);wCard.appendChild(nm);
+    });
+    tr.appendChild(wCard);
+  }
+}
+
+function renderCharmBoard(){
+  const el=document.getElementById('charmBoard');if(!el)return;
+  const players=Object.values(state.players)
+    .map(p=>({p,v:(p.throwReceived&&p.throwReceived[YM])||0}))
+    .sort((a,b)=>b.v-a.v).filter(x=>x.v>0);
+  el.innerHTML='';
+  if(!players.length){el.innerHTML='<div style="color:var(--mut);font-size:.85em">尚無魅力票記錄</div>';return;}
+  players.forEach(({p,v},i)=>{
+    const item=document.createElement('div');
+    item.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(233,30,99,.08);border:1px solid rgba(233,30,99,.2);border-radius:12px;padding:8px 14px';
+    const rank=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':`${i+1}. `;
+    const av=makeAvEl(p.avatar,30);av.style.border=`2px solid ${p.color||'#e91e63'}`;
+    item.appendChild(av);
+    const txt=document.createElement('span');txt.style.fontSize='.85em';
+    txt.innerHTML=`${rank}<b>${p.name}</b> <span style="color:#e91e63">💖 ${v}</span>`;
+    item.appendChild(txt);el.appendChild(item);
+  });
+}
+
+function drawKingBackground(king){
+  const canvas=document.getElementById('kingBgCanvas');
+  if(!canvas)return;
+  const banner=document.getElementById('kingBanner');
+  const W=banner.clientWidth||600;
+  const H=banner.clientHeight||360;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  const color=king.color||'#ffd700';
+
+  function paintFull(){
+    ctx.clearRect(0,0,W,H);
+    if(king.avatar&&_kingImg&&_kingImg.complete&&_kingImg.naturalWidth>0){
+      const img=_kingImg;
+      // Layer 1: Full-bleed blurred avatar
+      ctx.save();
+      ctx.filter='blur(40px) saturate(2) brightness(.8)';
+      ctx.globalAlpha=0.45;
+      const scale=Math.max(W/img.width,H/img.height)*1.6;
+      const sw=img.width*scale,sh=img.height*scale;
+      ctx.drawImage(img,(W-sw)/2,(H-sh)/2,sw,sh);
+      ctx.filter='none';ctx.globalAlpha=1;
+      ctx.restore();
+    }
+
+    // Layer 2: Deep dark gradient overlay
+    const ov=ctx.createLinearGradient(0,0,0,H);
+    ov.addColorStop(0,'rgba(6,3,24,.72)');
+    ov.addColorStop(.45,'rgba(6,3,24,.52)');
+    ov.addColorStop(1,'rgba(6,3,24,.78)');
+    ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
+
+    // Layer 3: Color radial bloom from bottom sides
+    const bl=ctx.createRadialGradient(W*.15,H*.9,0,W*.15,H*.9,W*.55);
+    bl.addColorStop(0,hexToRgba(color,.18));bl.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=bl;ctx.fillRect(0,0,W,H);
+    const br=ctx.createRadialGradient(W*.85,H*.9,0,W*.85,H*.9,W*.55);
+    br.addColorStop(0,'rgba(180,60,255,.14)');br.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=br;ctx.fillRect(0,0,W,H);
+
+    if(king.avatar&&_kingImg&&_kingImg.complete&&_kingImg.naturalWidth>0){
+      const img=_kingImg;
+      // Layer 4: Floating bokeh avatar circles
+      const pos=[
+        {xr:.06,yr:.22,sz:44,a:.28,bl:6},{xr:.94,yr:.22,sz:40,a:.24,bl:8},
+        {xr:.12,yr:.68,sz:34,a:.2,bl:10},{xr:.88,yr:.68,sz:36,a:.22,bl:8},
+        {xr:.03,yr:.5,sz:24,a:.14,bl:14},{xr:.97,yr:.5,sz:26,a:.15,bl:13},
+        {xr:.2,yr:.1,sz:20,a:.12,bl:16},{xr:.8,yr:.1,sz:18,a:.11,bl:18},
+      ];
+      pos.forEach(p=>{
+        const x=p.xr*W,y=p.yr*H;
+        ctx.save();
+        ctx.beginPath();ctx.arc(x,y,p.sz,0,Math.PI*2);ctx.clip();
+        ctx.filter=`blur(${p.bl}px)`;ctx.globalAlpha=p.a;
+        ctx.drawImage(img,x-p.sz,y-p.sz,p.sz*2,p.sz*2);
+        ctx.filter='none';ctx.globalAlpha=1;ctx.restore();
+        // Glow ring
+        ctx.save();ctx.globalAlpha=p.a*.9;
+        const rg=ctx.createRadialGradient(x,y,p.sz*.7,x,y,p.sz+8);
+        rg.addColorStop(0,hexToRgba(color,.6));rg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();ctx.arc(x,y,p.sz+8,0,Math.PI*2);ctx.fillStyle=rg;ctx.fill();
+        ctx.restore();
+      });
+    }
+
+    // Layer 5: Sparkle decorations
+    drawKingSparkles(ctx,W,H,color);
+
+    // Layer 6: Light leak at top center
+    const ll=ctx.createRadialGradient(W/2,-10,0,W/2,-10,W*.4);
+    ll.addColorStop(0,hexToRgba(color,.22));ll.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=ll;ctx.fillRect(0,0,W,H);
+  }
+
+  if(king.avatar){
+    if(!_kingImg||_kingImg._src!==king.avatar){
+      _kingImg=new Image();_kingImg._src=king.avatar;
+      _kingImg.onload=()=>paintFull();
+      _kingImg.src=king.avatar;
+    } else {paintFull();}
+  } else {
+    paintFull();
+  }
+}
+let _kingImg=null;
+
+function drawKingSparkles(ctx,W,H,color){
+  const sparks=[
+    {x:.07,y:.12,type:'star4',sz:10},{x:.93,y:.1,type:'star4',sz:9},
+    {x:.18,y:.88,type:'star6',sz:9},{x:.82,y:.86,type:'star6',sz:8},
+    {x:.03,y:.45,type:'diamond',sz:8},{x:.97,y:.45,type:'diamond',sz:8},
+    {x:.32,y:.05,type:'cross',sz:7},{x:.68,y:.05,type:'cross',sz:7},
+    {x:.5,y:.04,type:'star4',sz:12},
+    {x:.28,y:.95,type:'dot',sz:4},{x:.72,y:.93,type:'dot',sz:4},
+    {x:.12,y:.55,type:'dot',sz:3},{x:.88,y:.55,type:'dot',sz:3},
+  ];
+  sparks.forEach(s=>{
+    const x=s.x*W,y=s.y*H,sz=s.sz;
+    ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.globalAlpha=.6;
+    ctx.shadowBlur=12;ctx.shadowColor=color;
+    if(s.type==='star4'){
+      ctx.lineWidth=1.8;
+      for(let i=0;i<4;i++){const a=i*Math.PI/2-Math.PI/4;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*sz,y+Math.sin(a)*sz);ctx.stroke();}
+      ctx.beginPath();ctx.arc(x,y,sz*.25,0,Math.PI*2);ctx.fill();
+    }else if(s.type==='star6'){
+      ctx.lineWidth=1.5;
+      for(let i=0;i<6;i++){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*sz,y+Math.sin(a)*sz);ctx.stroke();}
+      ctx.beginPath();ctx.arc(x,y,sz*.22,0,Math.PI*2);ctx.fill();
+    }else if(s.type==='diamond'){
+      ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x,y-sz);ctx.lineTo(x+sz*.6,y);ctx.lineTo(x,y+sz);ctx.lineTo(x-sz*.6,y);ctx.closePath();ctx.stroke();
+    }else if(s.type==='cross'){
+      ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(x-sz,y);ctx.lineTo(x+sz,y);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x,y-sz);ctx.lineTo(x,y+sz);ctx.stroke();
+    }else{
+      ctx.beginPath();ctx.arc(x,y,sz,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  });
+  // Horizontal light leaks
+  [.28,.52,.76].forEach((yp,i)=>{
+    const g=ctx.createLinearGradient(0,yp*H,W,yp*H);
+    g.addColorStop(0,'rgba(255,255,255,0)');
+    g.addColorStop(.35,hexToRgba(color,i===1?.1:.07));
+    g.addColorStop(.65,hexToRgba(color,i===1?.1:.07));
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=g;ctx.fillRect(0,yp*H-1.5,W,3);
+  });
+  // Corner vignette glow
+  [[0,0],[W,0],[0,H],[W,H]].forEach(([cx2,cy2])=>{
+    const cg=ctx.createRadialGradient(cx2,cy2,0,cx2,cy2,W*.35);
+    cg.addColorStop(0,hexToRgba(color,.08));cg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=cg;ctx.fillRect(0,0,W,H);
+  });
+}
+
+function hexToRgba(hex,a){
+  if(hex.startsWith('#')){
+    const r=parseInt(hex.slice(1,3),16);const g=parseInt(hex.slice(3,5),16);const b=parseInt(hex.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
+  return `rgba(200,150,255,${a})`;
+}
+
+function renderCharmLeft(){
+  const el=document.getElementById('charmLeftDisplay');
+  if(!el||!me)return;
+  const left=getCharmLeft();
+  el.textContent=`💖 今日魅力票剩餘 ${left} 票`;
+}
+
+function renderKingBanner(){
+  const players=Object.values(state.players);
+  if(!players.length){
+    document.getElementById('kingName').textContent='尚無參賽者';
+    document.getElementById('kingScore').textContent='快來加入吧！';
+    return;
+  }
+  const sorted=players.slice().sort((a,b)=>getProgress(b)-getProgress(a));
+  const king=sorted[0];
+  const prog=Math.round(getProgress(king)*100);
+  const total=getMonthTotal(king).toFixed(1);
+  const adjT=getAdjTarget(king).toFixed(0);
+
+  // Avatar
+  const av=document.getElementById('kingAv');
+  if(king.avatar){av.innerHTML=`<img src="${king.avatar}" alt="king" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;}
+  else{av.innerHTML='🏆';}
+  av.style.border=`4px solid ${king.color||'var(--gold)'}`;
+
+  document.getElementById('kingName').textContent=king.name;
+  document.getElementById('kingScore').textContent=`加權 ${total} ／ 目標 ${adjT}（${prog}%）`;
+
+  // Medals
+  const mb=document.getElementById('kingBadges');
+  const medals=(king.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉');
+  mb.innerHTML=medals.slice(-5).map(m=>`<span style="font-size:1.4em">${m}</span>`).join('');
+
+  // Draw avatar background canvas
+  drawKingBackground(king);
+
+  // Resize observer for canvas quality
+  const banner=document.getElementById('kingBanner');
+  if(banner&&!banner._hasObserver){
+    banner._hasObserver=true;
+    if(window.ResizeObserver){
+      new ResizeObserver(()=>{if(state.players&&me)drawKingBackground(sorted[0]);}).observe(banner);
+    }
+  }
+
+  // Animated stars
+  const sb=document.getElementById('starBg');sb.innerHTML='';
+  for(let i=0;i<14;i++){
+    const star=document.createElement('div');
+    const x=Math.random()*100,y=Math.random()*100;
+    const sz=0.7+Math.random()*1.2,delay=Math.random()*3,dur=2+Math.random()*2;
+    star.style.cssText=`position:absolute;left:${x}%;top:${y}%;font-size:${sz}em;animation:float ${dur}s ${delay}s ease-in-out infinite;opacity:${0.3+Math.random()*.5}`;
+    star.textContent=CONFETTI_CHARS[i%CONFETTI_CHARS.length];
+    sb.appendChild(star);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// PLAYERS GRID (home)
+// ═══════════════════════════════════════════════
+function renderPlayersGrid(){
+  const players=Object.values(state.players).sort((a,b)=>getProgress(b)-getProgress(a));
+  const grid=document.getElementById('playersGrid');grid.innerHTML='';
+  players.forEach(p=>{
+    const prog=Math.round(getProgress(p)*100);
+    const total=getMonthTotal(p).toFixed(1);
+    const adjT=getAdjTarget(p).toFixed(0);
+    const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
+    const card=document.createElement('div');card.className='player-card';
+    const av=makeAvEl(p.avatar,64);
+    av.style.cssText+=`;margin:0 auto 10px;border:3px solid ${p.color||'#f7971e'}`;
+    card.appendChild(av);
+    const inner=document.createElement('div');
+    const charmCount=(p.throwReceived&&p.throwReceived[YM])||0;
+    const isWarrior=getPentagonWarriors().some(w=>w.empId===p.empId);
+    inner.innerHTML=`<div class="pc-name">${p.name} ${medals}${isWarrior?' <span title="五邊形戰士" style="font-size:.9em">⭐</span>':''}</div>
+      <div class="pc-sub">${p.empId} ｜ 目標 ${p.target}/日</div>
+      <div class="pc-prog-wrap"><div class="pc-prog-fill" style="width:${prog}%;background:${p.color||'#f7971e'}"></div></div>
+      <div style="font-size:.75em;color:var(--mut)">進度 <b style="color:${p.color||'var(--gold)'}">${prog}%</b> ｜ ${total}/${adjT}</div>
+      <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:.75em;color:#e91e63">💖 魅力票 ${charmCount}</span>
+        ${p.empId!==me?`<button class="charm-btn" onclick="doCharm('${p.empId}',event)" style="background:linear-gradient(135deg,#e91e63,#c2185b);border:none;border-radius:14px;color:#fff;font-size:.72em;font-weight:700;padding:4px 10px;cursor:pointer;touch-action:manipulation">投票 💖</button>`:`<button class="charm-btn" onclick="doCharm('${p.empId}',event)" style="background:linear-gradient(135deg,#e91e63,#c2185b);border:none;border-radius:14px;color:#fff;font-size:.72em;font-weight:700;padding:4px 10px;cursor:pointer;touch-action:manipulation">投票 💖</button>`}
+      </div>`;
+    card.appendChild(inner);
+    grid.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DAILY INPUT
+// ═══════════════════════════════════════════════
+function adj(id,d){const el=document.getElementById(id);el.value=Math.max(0,(parseInt(el.value)||0)+d);updDW();}
+function adjLeave(d){const el=document.getElementById('ileave');el.value=Math.max(0,Math.min(8,(parseFloat(el.value)||0)+d));updDW();}
+
+function updDW(){
+  const ja=+document.getElementById('ija').value||0;
+  const hy=+document.getElementById('ihy').value||0;
+  const sb=+document.getElementById('isb').value||0;
+  const tx=+document.getElementById('itx').value||0;
+  const leave=+document.getElementById('ileave').value||0;
+  const leaveDays=(leave/8).toFixed(2);
+  document.getElementById('leaveDays').textContent=leave>0?`= ${leaveDays} 天`:'';
+  document.getElementById('dwsum').textContent=`今日加權合計：${(ja+hy*.8+sb*.6+tx*.6).toFixed(1)}`;
+
+  // Show adjusted target
+  const p=state.players[me];if(!p)return;
+  // estimate new effective days if today's leave is applied
+  const wdAll=getWD(today.getFullYear(),today.getMonth()+1).length;
+  const otherLeaveDays=getOtherLeaveHours(p)/8;
+  const effDays=Math.max(0,wdAll-otherLeaveDays-leave/8);
+  const adjT=(p.target*effDays).toFixed(1);
+  document.getElementById('adjTarget').textContent=leave>0?`調整後月目標：${adjT} 件`:'';
+}
+
+function getOtherLeaveHours(p){
+  // Leave hours from all days EXCEPT today
+  const l=p.logs&&p.logs[YM];if(!l)return 0;
+  return Object.entries(l).filter(([d])=>d!==TODAY).reduce((s,[,r])=>s+(r.leave||0),0);
+}
+
+function renderDaily(){
+  document.getElementById('ddlabel').textContent=TODAY;
+  const p=state.players[me];const logs=(p.logs&&p.logs[YM])||{};const tl=logs[TODAY];
+  document.getElementById('already').style.display=tl?'block':'none';
+  document.getElementById('ija').value=tl?tl.ja||0:0;
+  document.getElementById('ihy').value=tl?tl.hy||0:0;
+  document.getElementById('isb').value=tl?tl.sb||0:0;
+  document.getElementById('itx').value=tl?tl.tx||0:0;
+  document.getElementById('ileave').value=tl?tl.leave||0:0;
+  updDW();renderLog();
+}
+
+function submitDaily(){
+  const p=state.players[me];
+  if(!p.logs)p.logs={};if(!p.logs[YM])p.logs[YM]={};
+  const rec={
+    ja:+document.getElementById('ija').value||0,
+    hy:+document.getElementById('ihy').value||0,
+    sb:+document.getElementById('isb').value||0,
+    tx:+document.getElementById('itx').value||0,
+    leave:+document.getElementById('ileave').value||0
+  };
+  p.logs[YM][TODAY]=rec;
+  // Check target
+  const prog=getProgress(p);
+  if(prog>=1&&!p.reachedGoal){
+    p.reachedGoal=YM;
+    const cnt=Object.values(state.players).filter(x=>x.reachedGoal===YM).length;
+    const m=cnt===1?'gold':cnt===2?'silver':'bronze';
+    if(!p.medals)p.medals=[];p.medals.push(m);
+    showToast(`🎉 達標！獲得 ${m==='gold'?'🥇金牌':m==='silver'?'🥈銀牌':'🥉銅牌'}！`,'success');
+  }
+  save();bcast('update',{p});
+  renderDaily();
+  checkWarriorCelebration();
+  showToast('✅ 今日記錄已儲存');
+  // Also refresh home if on home
+  document.getElementById('tbprog').textContent=` ${Math.round(getProgress(p)*100)}%`;
+}
+
+function renderLog(){
+  const p=state.players[me];const logs=(p.logs&&p.logs[YM])||{};
+  const wd=getWDSF(today.getFullYear(),today.getMonth()+1);
+  document.getElementById('logbody').innerHTML=wd.slice().reverse().map(d=>{
+    const r=logs[d];
+    if(!r)return`<tr><td style="color:var(--mut)">${d}</td><td colspan="6" style="color:rgba(255,255,255,.15)">未輸入</td></tr>`;
+    return`<tr><td>${d}</td><td>${r.ja||0}</td><td>${r.hy||0}</td><td>${r.sb||0}</td><td>${r.tx||0}</td><td>${r.leave||0}</td><td style="color:var(--ora);font-weight:700">${cW(r).toFixed(1)}</td></tr>`;
+  }).join('');
+  const total=getMonthTotal(p);const adjT=getAdjTarget(p).toFixed(0);
+  const leaveTot=(getTotalLeaveHours(p)/8).toFixed(2);
+  document.getElementById('logsum').innerHTML=`加權累計 <b style="color:var(--gold)">${total.toFixed(1)}</b> ／ 調整目標 <b>${adjT}</b>（扣請假 ${leaveTot} 天）｜ <b style="color:var(--ora)">${Math.round(getProgress(p)*100)}%</b>`;
+}
+
+// ═══════════════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════════════
+function openDeleteModal(){
+  if(!me||!state.players[me])return;
+  document.getElementById('delName').textContent=state.players[me].name;
+  document.getElementById('deleteModal').style.display='flex';
+}
+function confirmDelete(){
+  document.getElementById('deleteModal').style.display='none';
+  deleteMyChar();
+}
+function deleteMyChar(){
+  if(!confirm(`確定刪除「${state.players[me].name}」？資料無法恢復！`))return;
+  bcast('delete',{});delete state.players[me];save();me=null;
+  document.getElementById('gameScreen').classList.remove('on');
+  document.getElementById('titleScreen').style.display='block';
+  renderExisting();showToast('角色已刪除');
+}
+
+// ═══════════════════════════════════════════════
+// STATS + PENTAGON
+// ═══════════════════════════════════════════════
+// For pentagon: use max of ALL players as the 100% baseline
+function getAllMax(){
+  const players=Object.values(state.players);
+  let maxJa=1,maxHy=1,maxSb=1,maxTx=1,maxThr=1;
+  players.forEach(p=>{
+    const logs=(p.logs&&p.logs[YM])||{};
+    let ja=0,hy=0,sb=0,tx=0;
+    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
+    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
+    maxJa=Math.max(maxJa,ja);maxHy=Math.max(maxHy,hy);maxSb=Math.max(maxSb,sb);
+    maxTx=Math.max(maxTx,tx);maxThr=Math.max(maxThr,thr);
+  });
+  return[maxJa,maxHy,maxSb,maxTx,maxThr];
+}
+
+function renderStats(){
+  const players=Object.values(state.players);
+  const sg=document.getElementById('sgrid');sg.innerHTML='';
+  const maxVals=getAllMax();
+  players.forEach(p=>{
+    const logs=(p.logs&&p.logs[YM])||{};
+    let ja=0,hy=0,sb=0,tx=0;
+    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
+    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
+    const prog=Math.round(getProgress(p)*100);
+    const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
+    const card=document.createElement('div');card.className='scard';card.onclick=()=>openPenta(p.empId);
+    const header=document.createElement('div');header.className='scard-header';
+    const av=makeAvEl(p.avatar,46);av.style.border=`2px solid ${p.color||'#f7971e'}`;
+    header.appendChild(av);
+    const info=document.createElement('div');
+    info.innerHTML=`<div style="font-weight:700;font-size:.92em">${p.name} ${medals}</div>
+      <div style="font-size:.72em;color:var(--mut)">${p.empId} ｜ 目標${p.target}/日</div>
+      <div class="progbar"><div class="progfill" style="width:${prog}%;background:${p.color||'#f7971e'}"></div></div>
+      <div style="font-size:.7em;color:var(--mut)">進度 ${prog}%</div>`;
+    header.appendChild(info);card.appendChild(header);
+    const bars=[['結案',ja,'#f7971e',maxVals[0]],['緩議',hy,'#3498db',maxVals[1]],['授變',sb,'#9b59b6',maxVals[2]],['塗銷',tx,'#2ecc71',maxVals[3]],['魅力票',thr,'#e91e63',maxVals[4]]];
+    bars.forEach(([l,v,c,mx])=>{
+      const row=document.createElement('div');row.className='brow';
+      row.innerHTML=`<div class="bl">${l}</div><div class="bbar"><div style="width:${Math.round(v/mx*100)}%;height:100%;background:${c};border-radius:3px"></div></div><div class="bval">${v}</div>`;
+      card.appendChild(row);
+    });
+    sg.appendChild(card);
+  });
+}
+
+function openPenta(empId){
+  const p=state.players[empId];
+  const logs=(p.logs&&p.logs[YM])||{};
+  let ja=0,hy=0,sb=0,tx=0;
+  Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
+  const thr=(p.throwReceived&&p.throwReceived[YM])||0;
+  const vals=[ja,hy,sb,tx,thr];
+  const maxVals=getAllMax();
+
+  // Avatar in modal
+  const pmAv=document.getElementById('pm-av');
+  if(p.avatar){pmAv.innerHTML=`<img src="${p.avatar}" alt="av">`;}
+  else{pmAv.textContent='👤';}
+  pmAv.style.border=`3px solid ${p.color||'var(--gold)'}`;
+
+  document.getElementById('pmtitle').textContent=p.name+' 能力五邊形';
+  document.getElementById('pm').classList.add('on');
+
+  const cv=document.getElementById('pmc');const ctx=cv.getContext('2d');
+  const W=200,H=200,cx=100,cy=108,r=66;
+  ctx.clearRect(0,0,W,H);
+  const lbls=['結案','緩議','授變','塗銷','魅力值'];
+  const cols=['#f7971e','#3498db','#9b59b6','#2ecc71','#e74c3c'];
+
+  // Grid
+  for(let lv=1;lv<=5;lv++){
+    ctx.beginPath();
+    for(let i=0;i<5;i++){const a=(Math.PI*2/5)*i-Math.PI/2;const x=cx+r*(lv/5)*Math.cos(a),y=cy+r*(lv/5)*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.closePath();ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=.5;ctx.stroke();
+  }
+  for(let i=0;i<5;i++){const a=(Math.PI*2/5)*i-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=.5;ctx.stroke();}
+
+  // Data (normalised against all-players max)
+  ctx.beginPath();
+  vals.forEach((v,i)=>{
+    const norm=v/maxVals[i];
+    const a=(Math.PI*2/5)*i-Math.PI/2;
+    const x=cx+r*norm*Math.cos(a),y=cy+r*norm*Math.sin(a);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();ctx.fillStyle=(p.color||'#f7971e')+'33';ctx.fill();ctx.strokeStyle=p.color||'#f7971e';ctx.lineWidth=2;ctx.stroke();
+
+  // Dots + labels
+  vals.forEach((v,i)=>{
+    const norm=v/maxVals[i];const a=(Math.PI*2/5)*i-Math.PI/2;
+    const dvx=cx+r*norm*Math.cos(a),dvy=cy+r*norm*Math.sin(a);
+    ctx.beginPath();ctx.arc(dvx,dvy,4,0,Math.PI*2);ctx.fillStyle=cols[i];ctx.fill();
+    const lx=cx+(r+18)*Math.cos(a),ly=cy+(r+18)*Math.sin(a);
+    ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(lbls[i],lx,ly);
+  });
+
+  document.getElementById('pmlabels').innerHTML=lbls.map((l,i)=>`<span style="color:${cols[i]}">${l}:<b>${vals[i]}</b></span>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════════════════
+function renderLB(){
+  const players=Object.values(state.players).sort((a,b)=>getProgress(b)-getProgress(a));
+  const lbw=document.getElementById('lbw');lbw.innerHTML='';
+  players.forEach((p,i)=>{
+    const row=document.createElement('div');row.className='lbr';
+    const rank=document.createElement('div');rank.className='lbrank';
+    if(i<3)rank.style.background='rgba(255,215,0,.15)';
+    rank.textContent=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+    const av=makeAvEl(p.avatar,38);av.className='lb-av';av.style.border=`2px solid ${p.color||'#f7971e'}`;
+    const info=document.createElement('div');info.style.flex='1';
+    const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
+    const prog=Math.round(getProgress(p)*100);
+    info.innerHTML=`<div style="font-weight:700;font-size:.9em">${p.name} ${medals}</div>
+      <div style="font-size:.7em;color:var(--mut)">${p.empId} ｜ 目標 ${p.target}/日</div>`;
+    const score=document.createElement('div');score.style.textAlign='right';
+    score.innerHTML=`<div style="color:var(--gold);font-weight:700">${getMonthTotal(p).toFixed(1)}</div>
+      <div style="font-size:.73em;color:var(--mut)">${prog}%</div>`;
+    row.appendChild(rank);row.appendChild(av);row.appendChild(info);row.appendChild(score);
+    lbw.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// TITLES
+// ═══════════════════════════════════════════════
+function getPentagonWarriors(){
+  // A player is a pentagon warrior if their values for ALL 5 axes
+  // reach 100% of the global max (i.e., they are tied-for or #1 in all 5)
+  const players=Object.values(state.players);
+  const maxVals=getAllMax(); // [maxJa,maxHy,maxSb,maxTx,maxThr]
+  return players.filter(p=>{
+    const logs=(p.logs&&p.logs[YM])||{};
+    let ja=0,hy=0,sb=0,tx=0;
+    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
+    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
+    const vals=[ja,hy,sb,tx,thr];
+    // Must be >= 90% of the max in each dimension (allows tied top)
+    return vals.every((v,i)=>maxVals[i]>0&&v/maxVals[i]>=0.999);
+  });
+}
+
+function renderTitles(){
+  const players=Object.values(state.players);
+  let jaBest={p:null,v:0},hyBest={p:null,v:0},throwBest={p:null,v:0};
+  players.forEach(p=>{
+    const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0;
+    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0});
+    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
+    if(ja>jaBest.v)jaBest={p,v:ja};
+    if(hy>hyBest.v)hyBest={p,v:hy};
+    if(thr>throwBest.v)throwBest={p,v:thr};
+  });
+  const tg=document.getElementById('tgrid');tg.innerHTML='';
+  // Pentagon warriors
+  const warriors=getPentagonWarriors();
+  if(warriors.length>0){
+    const wCard=document.createElement('div');
+    wCard.className='tcard';
+    wCard.style.cssText='background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(130,60,255,.12));border:2px solid rgba(255,215,0,.4);position:relative;overflow:hidden';
+    wCard.innerHTML=`<div style="position:absolute;inset:0;background:conic-gradient(from 0deg,rgba(255,215,0,.05),rgba(130,60,255,.05),rgba(0,200,255,.05),rgba(255,215,0,.05));animation:auroraRot 8s linear infinite;pointer-events:none"></div>
+      <div style="font-size:2em;margin-bottom:7px;position:relative">⭐</div>
+      <div style="color:var(--gold);font-weight:900;font-size:.95em;margin-bottom:3px;position:relative;background:linear-gradient(135deg,#ffd700,#fff,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">五邊形戰士</div>
+      <div style="font-size:.72em;color:var(--mut);margin-bottom:10px;position:relative">五項全滿！</div>`;
+    warriors.forEach(w=>{
+      const av=makeAvEl(w.avatar,52);av.style.cssText+=`;margin:6px auto;border:3px solid var(--gold);box-shadow:0 0 14px rgba(255,215,0,.5)`;
+      wCard.appendChild(av);
+      const nm=document.createElement('div');nm.style.cssText='font-weight:700;font-size:.88em;position:relative';nm.textContent=w.name;wCard.appendChild(nm);
+    });
+    tg.appendChild(wCard);
+  }
+
+  [
+    ['⚡','結案王','每月結案最多',jaBest,'件'],
+    ['🌊','緩議王','每月緩議最多',hyBest,'件'],
+    ['💖','人氣王','獲得魅力票最多',throwBest,'票'],
+  ].forEach(([icon,name,desc,best,unit])=>{
+    const card=document.createElement('div');card.className='tcard';
+    card.innerHTML=`<div style="font-size:2em;margin-bottom:7px">${icon}</div><div style="color:var(--ora);font-weight:700;font-size:.87em;margin-bottom:3px">${name}</div><div style="font-size:.72em;color:var(--mut);margin-bottom:10px">${desc}</div>`;
+    if(best.p){
+      const av=makeAvEl(best.p.avatar,60);
+      av.className='title-av';av.style.border=`3px solid var(--gold)`;av.style.margin='8px auto 6px';
+      card.appendChild(av);
+      const nm=document.createElement('div');nm.style.fontWeight='700';nm.textContent=best.p.name;
+      const vl=document.createElement('div');vl.style.cssText='font-size:.72em;color:var(--mut);margin-top:3px';vl.textContent=`${best.v} ${unit}`;
+      card.appendChild(nm);card.appendChild(vl);
+    }else{
+      card.innerHTML+=`<div style="color:var(--mut)">暫無</div>`;
+    }
+    tg.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// CHARM VOTE
+// ═══════════════════════════════════════════════
+function getCharmLeft(){
+  const k=`charm1_${me}_${TODAY}`;
+  return Math.max(0,3-parseInt(localStorage.getItem(k)||'0'));
+}
+function doCharm(targetId, evt){
+  if(evt){evt.stopPropagation();}
+  if(!me){showToast('請先登入','danger');return;}
+  // 允許投票給自己
+  const left=getCharmLeft();
+  if(left<=0){showToast('今日已用完3票！','danger');return;}
+  const tp=state.players[targetId];if(!tp)return;
+  if(!tp.throwReceived)tp.throwReceived={};
+  if(!tp.throwReceived[YM])tp.throwReceived[YM]=0;
+  tp.throwReceived[YM]++;
+  const k=`charm1_${me}_${TODAY}`;
+  localStorage.setItem(k,String(3-left+1));
+  save();
+  bcast('stone',{target:targetId});
+  playCharm(targetId);
+  showToast(`💖 已投票給 ${tp.name}！剩餘 ${left-1} 票`,'success');
+  renderPlayersGrid();
+  renderKingBanner();
+  renderCharmBoard();
+  // refresh vote tab if open
+  const activeVote=document.getElementById('p-vote');
+  if(activeVote&&activeVote.classList.contains('on'))renderVoteTab();
+}
+
+// ═══════════════════════════════════════════════
+// STONE ANIMATION (kept for multi-tab fun)
+// ═══════════════════════════════════════════════
+let stones=[];let bumpTimers={};
+function bumpPlayer(id){bumpTimers[id]=2;}
+function playCharm(targetId){
+  const cv=document.getElementById('sc');cv.style.display='block';
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  // Find approximate position of target card
+  const cards=document.querySelectorAll('.player-card');
+  let tx=window.innerWidth/2,ty=window.innerHeight/2;
+  const players=Object.values(state.players).sort((a,b)=>getProgress(b)-getProgress(a));
+  const idx=players.findIndex(p=>p.empId===targetId);
+  if(idx>=0&&cards[idx]){const r=cards[idx].getBoundingClientRect();tx=r.left+r.width/2;ty=r.top+r.height/2;}
+  const hearts=[];
+  for(let i=0;i<6;i++)hearts.push({x:tx+(-40+Math.random()*80),y:ty,vy:-2-Math.random()*2,vx:(-1+Math.random()*2),t:0,dur:45+Math.floor(Math.random()*15),emoji:'💖'});
+  function animH(){
+    const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+    hearts.forEach(h=>{h.t++;h.x+=h.vx;h.y+=h.vy;ctx.save();ctx.globalAlpha=1-h.t/h.dur;ctx.font=`${18+h.t*.3}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(h.emoji,h.x,h.y);ctx.restore();});
+    if(hearts.some(h=>h.t<h.dur))requestAnimationFrame(animH);
+    else{ctx.clearRect(0,0,cv.width,cv.height);cv.style.display='none';}
+  }
+  animH();
+}
+
+function playStone(fromId,toId){
+  const cv=document.getElementById('sc');cv.style.display='block';
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  stones.push({fx:Math.random()*window.innerWidth,fy:50,tx:Math.random()*window.innerWidth,ty:window.innerHeight*.4,t:0,dur:50});
+  if(stones.length===1)animSt();
+}
+function animSt(){
+  const cv=document.getElementById('sc');const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  stones=stones.filter(s=>s.t<s.dur);
+  stones.forEach(s=>{s.t++;const pr=s.t/s.dur;const px=s.fx+(s.tx-s.fx)*pr;const arc=Math.sin(pr*Math.PI)*100;const py=s.fy+(s.ty-s.fy)*pr-arc;ctx.save();ctx.globalAlpha=pr<.9?1:1-(pr-.9)/.1;ctx.translate(px,py);ctx.rotate(pr*Math.PI*5);ctx.font='22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🪨',0,0);ctx.restore();});
+  if(stones.length)requestAnimationFrame(animSt);
+  else{ctx.clearRect(0,0,cv.width,cv.height);cv.style.display='none';}
+}
+
+// ═══════════════════════════════════════════════
+// TAB SWITCH
+// ═══════════════════════════════════════════════
+function switchTab(tab){
+  const names=['home','daily','stats','lb','titles','vote'];
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('on',names[i]===tab));
+  document.querySelectorAll('.pane').forEach(el=>el.classList.remove('on'));
+  document.getElementById('p-'+tab).classList.add('on');
+  if(tab==='home'){renderKingBanner();renderPlayersGrid();renderCharmLeft();renderCharmBoard();renderTitlesRow();}
+  if(tab==='daily')renderDaily();
+  if(tab==='stats')renderStats();
+  if(tab==='lb')renderLB();
+  if(tab==='titles')renderTitles();
+  if(tab==='vote')renderVoteTab();
+  // Update topbar progress
+  if(me&&state.players[me])document.getElementById('tbprog').textContent=` ${Math.round(getProgress(state.players[me])*100)}%`;
+}
+
+function refreshCurrentTab(){
+  const on=document.querySelector('.tab.on');
+  if(!on)return;
+  const names=['home','daily','stats','lb','titles','vote'];
+  const idx=Array.from(document.querySelectorAll('.tab')).indexOf(on);
+  if(idx>=0)switchTab(names[idx]);
+}
+
+// ═══════════════════════════════════════════════
+// MONTHLY RESET
+// ═══════════════════════════════════════════════
+function checkReset(){
+  const last=localStorage.getItem('cs1reset');
+  if(last!==YM){
+    Object.values(state.players).forEach(p=>{p.reachedGoal=null;});
+    localStorage.setItem('cs1reset',YM);save();
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+let tT;
+function showToast(msg,type='info'){
+  const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';
+  el.style.borderColor=type==='danger'?'rgba(255,80,80,.4)':type==='success'?'rgba(68,255,136,.4)':'rgba(255,255,255,.15)';
+  clearTimeout(tT);tT=setTimeout(()=>el.style.display='none',3200);
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+load();renderExisting();
+window.addEventListener('resize',()=>{const cv=document.getElementById('sc');cv.width=window.innerWidth;cv.height=window.innerHeight;});
+
+// ══════════════════════════════════════════════
+// PENTAGON WARRIOR CELEBRATION
+// ══════════════════════════════════════════════
+function showWarriorCelebration(){
+  const overlay=document.getElementById('warriorOverlay');
+  const cv=document.getElementById('warriorCanvas');
+  if(!overlay||!cv)return;
+  overlay.style.display='block';
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+
+  // Fireworks particles
+  const particles=[];
+  const colors=['#ffd700','#e040fb','#00bcd4','#ff4081','#69f0ae','#ff6d00','#fff'];
+  function spawnBurst(x,y){
+    for(let i=0;i<80;i++){
+      const angle=Math.random()*Math.PI*2;
+      const speed=2+Math.random()*8;
+      particles.push({
+        x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-3,
+        life:1,decay:.008+Math.random()*.015,
+        size:2+Math.random()*5,
+        color:colors[Math.floor(Math.random()*colors.length)],
+        trail:[],type:Math.random()<.3?'star':'circle'
+      });
+    }
+  }
+
+  // Initial bursts
+  spawnBurst(W*.3,H*.3);spawnBurst(W*.7,H*.3);
+  spawnBurst(W*.5,H*.45);spawnBurst(W*.2,H*.6);spawnBurst(W*.8,H*.6);
+
+  // Schedule more bursts
+  const burstTimers=[400,800,1100,1500,1900].map(t=>setTimeout(()=>{
+    spawnBurst(W*(0.2+Math.random()*.6),H*(0.2+Math.random()*.5));
+  },t));
+
+  let t=0;
+  // Overlapping rainbow sweep
+  function animWarrior(){
+    ctx.clearRect(0,0,W,H);
+    // Dark overlay
+    ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(0,0,W,H);
+    // Rainbow sweep
+    const sweep=ctx.createLinearGradient(0,0,W,H);
+    const phase=(t*.005)%1;
+    sweep.addColorStop(0,'rgba(0,0,0,0)');
+    sweep.addColorStop(phase,'rgba(255,215,0,.06)');
+    sweep.addColorStop(Math.min(1,phase+.1),'rgba(180,60,255,.06)');
+    sweep.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=sweep;ctx.fillRect(0,0,W,H);
+
+    particles.forEach((p,i)=>{
+      p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.vx*=.99;p.life-=p.decay;
+      if(p.type==='star'){
+        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(t*.1);
+        ctx.globalAlpha=Math.max(0,p.life);
+        const s=p.size,col=p.color;
+        ctx.fillStyle=col;
+        ctx.beginPath();
+        for(let j=0;j<5;j++){
+          const a=(j/5)*Math.PI*2-Math.PI/2;
+          const b=a+Math.PI/5;
+          j===0?ctx.moveTo(Math.cos(a)*s,Math.sin(a)*s):ctx.lineTo(Math.cos(a)*s,Math.sin(a)*s);
+          ctx.lineTo(Math.cos(b)*s*.4,Math.sin(b)*s*.4);
+        }
+        ctx.closePath();ctx.fill();
+        // glow
+        ctx.shadowBlur=10;ctx.shadowColor=col;ctx.fill();
+        ctx.restore();
+      } else {
+        ctx.save();ctx.globalAlpha=Math.max(0,p.life);
+        ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fillStyle=p.color;
+        ctx.shadowBlur=8;ctx.shadowColor=p.color;
+        ctx.fill();ctx.restore();
+      }
+    });
+    // Remove dead
+    for(let i=particles.length-1;i>=0;i--){if(particles[i].life<=0)particles.splice(i,1);}
+    t++;
+    if(t<260||particles.length>0)requestAnimationFrame(animWarrior);
+    else{overlay.style.display='none';}
+  }
+  animWarrior();
+
+  // Auto hide after 5s
+  setTimeout(()=>{overlay.style.display='none';burstTimers.forEach(clearTimeout);},5000);
+  overlay.onclick=()=>{overlay.style.display='none';burstTimers.forEach(clearTimeout);};
+}
+
+// Check for new pentagon warriors and celebrate
+let _prevWarriors=new Set();
+function checkWarriorCelebration(){
+  const warriors=getPentagonWarriors();
+  warriors.forEach(w=>{
+    if(me&&w.empId===me&&!_prevWarriors.has(w.empId)){
+      setTimeout(()=>showWarriorCelebration(),300);
+    }
+    _prevWarriors.add(w.empId);
+  });
+}
+
+// ══════════════════════════════════════════════
+// SPARKLE BACKGROUND CANVAS
+// ══════════════════════════════════════════════
+(function initSparkle(){
+  const cv=document.getElementById('sparkleCanvas');
+  if(!cv)return;
+  let W,H,pts=[];
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  // Create particles
+  for(let i=0;i<90;i++){
+    pts.push({
+      x:Math.random()*1600,y:Math.random()*900,
+      vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.18,
+      r:Math.random()*1.6+.4,
+      opacity:Math.random()*.6+.1,
+      twinkle:Math.random()*Math.PI*2,
+      speed:Math.random()*.04+.015,
+      color:['rgba(255,215,0,','rgba(180,100,255,','rgba(100,180,255,','rgba(255,180,255,'][Math.floor(Math.random()*4)]
+    });
+  }
+  // Lines connecting nearby particles
+  function draw(){
+    const ctx=cv.getContext('2d');
+    cv.width=W;cv.height=H;
+    ctx.clearRect(0,0,W,H);
+    const t=Date.now()/1000;
+    pts.forEach(p=>{
+      p.x=(p.x+p.vx+W)%W;p.y=(p.y+p.vy+H)%H;
+      p.twinkle+=p.speed;
+      const alpha=p.opacity*(0.5+Math.sin(p.twinkle)*0.5);
+      // Glow
+      ctx.save();
+      const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);
+      g.addColorStop(0,p.color+(alpha*.9)+')');
+      g.addColorStop(1,p.color+'0)');
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r*4,0,Math.PI*2);
+      ctx.fillStyle=g;ctx.fill();
+      // Core dot
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color+alpha+')';ctx.fill();
+      ctx.restore();
+    });
+    // Draw connecting lines for nearby particles
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<100){
+          ctx.save();ctx.globalAlpha=(1-dist/100)*.12;
+          ctx.strokeStyle='rgba(200,150,255,1)';ctx.lineWidth=.6;
+          ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+</script>
+</body>
+</html>
