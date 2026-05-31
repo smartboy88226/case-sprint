@@ -2,8 +2,10 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,viewport-fit=cover">
 <title>⚡ 案件衝刺排行</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;min-height:100vh;font-family:'Segoe UI',sans-serif;background:linear-gradient(160deg,#0d0830 0%,#0d0d1f 40%,#0b1a0e 100%);background-attachment:fixed;color:#eee;overflow-x:hidden}
@@ -216,10 +218,160 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 @keyframes warriorPulse{from{letter-spacing:2px;opacity:.9}to{letter-spacing:6px;opacity:1}}
 .warrior-sub{font-size:clamp(1em,3vw,1.5em);color:rgba(255,255,255,.9);margin-top:8px;
   animation:float 2s ease-in-out infinite}
+
+/* ══════════════════════════════
+   MOBILE RESPONSIVE
+   ══════════════════════════════ */
+
+/* Safe area insets for notch phones */
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* ── Small phones (≤480px) ── */
+@media (max-width: 480px) {
+  .tglow { font-size: 2em !important; padding: 24px 16px 4px !important; }
+  .tsub { font-size: .72em !important; margin-bottom: 18px !important; }
+  .rpanel { padding: 0 10px 30px !important; }
+  .box { padding: 16px 14px !important; border-radius: 14px !important; }
+  .box h3 { font-size: .85em !important; margin-bottom: 12px !important; }
+  .fi { font-size: .9em !important; padding: 9px 11px !important; }
+
+  /* Topbar */
+  .topbar { padding: 7px 10px !important; gap: 5px !important; }
+  .pbadge { padding: 4px 9px !important; font-size: .8em !important; }
+  .tab { padding: 5px 9px !important; font-size: .7em !important; }
+  .btn.bg.bsm { padding: 5px 10px !important; font-size: .72em !important; }
+
+  /* Main content */
+  .main { padding: 12px 10px !important; }
+
+  /* King banner */
+  .king-banner { min-height: 260px !important; padding: 20px 14px 18px !important; gap: 8px !important; }
+  .king-avatar { width: 90px !important; height: 90px !important; }
+  .king-name { font-size: 1.3em !important; }
+  .king-score { font-size: .8em !important; }
+
+  /* Titles row */
+  #titlesRow { gap: 8px !important; }
+  #titlesRow > div { min-width: 90px !important; padding: 10px 8px !important; font-size: .85em !important; }
+
+  /* Players grid */
+  .players-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  .player-card { padding: 12px 10px !important; }
+  .pc-avatar, .pc-avatar img { width: 50px !important; height: 50px !important; }
+
+  /* Daily input */
+  .daily-wrap { max-width: 100% !important; }
+  .irow { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+  .ibox { padding: 10px !important; }
+  .ibox label { font-size: .68em !important; }
+  .numctrl input { font-size: 1.2em !important; padding: 6px 2px !important; }
+  .numctrl button { padding: 6px 10px !important; font-size: 1.2em !important; }
+  .leave-row { padding: 10px !important; gap: 8px !important; }
+  .leave-input { width: 110px !important; }
+
+  /* Stats grid */
+  .sgrid { grid-template-columns: 1fr !important; }
+
+  /* Leaderboard */
+  .lbw { max-width: 100% !important; }
+  .lbr { padding: 9px 10px !important; gap: 8px !important; }
+
+  /* Titles */
+  .tgrid { grid-template-columns: 1fr 1fr !important; gap: 9px !important; }
+  .tcard { padding: 14px 10px !important; }
+
+  /* Penta modal */
+  .pmb { padding: 18px 14px !important; }
+  #pmc { width: 180px !important; height: 180px !important; }
+
+  /* Vote grid */
+  #voteGrid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+
+  /* Log table */
+  .lt { font-size: .74em !important; }
+  .lt th, .lt td { padding: 4px 5px !important; }
+}
+
+/* ── Medium phones (481–768px) ── */
+@media (min-width: 481px) and (max-width: 768px) {
+  .tglow { font-size: 2.2em !important; }
+  .rpanel { padding: 0 14px 36px !important; }
+  .players-grid { grid-template-columns: 1fr 1fr !important; }
+  .irow { grid-template-columns: 1fr 1fr !important; }
+  .tgrid { grid-template-columns: 1fr 1fr !important; }
+  #voteGrid { grid-template-columns: 1fr 1fr !important; }
+  .main { padding: 14px 12px !important; }
+  .king-avatar { width: 100px !important; height: 100px !important; }
+}
+
+/* ── Prevent horizontal scroll ── */
+html, body { overflow-x: hidden !important; }
+* { max-width: 100%; }
+img { max-width: 100%; height: auto; }
+
+/* ── Better tap targets ── */
+@media (max-width: 768px) {
+  button, .tab, .tbtn, .charm-btn {
+    min-height: 36px;
+    min-width: 36px;
+  }
+  /* Increase font size of inputs on mobile to prevent iOS zoom-in */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  .fi {
+    font-size: 16px !important; /* prevents iOS auto-zoom */
+  }
+  .numctrl input {
+    font-size: 16px !important;
+  }
+  .leave-input input {
+    font-size: 16px !important;
+  }
+}
+
+/* ── Fix tabs overflow on small screens ── */
+@media (max-width: 600px) {
+  .tabs {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    max-width: calc(100vw - 120px) !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .topbar > div:first-child { width: 100%; }
+  .topbar { flex-direction: column !important; align-items: flex-start !important; }
+}
+
+/* Firebase status */
+.fb-status{display:inline-flex;align-items:center;gap:5px;font-size:.72em;color:var(--mut);padding:3px 8px;border-radius:10px;background:rgba(255,255,255,.05)}
+.fb-dot{width:7px;height:7px;border-radius:50%;background:var(--mut);flex-shrink:0;transition:background .3s}
+.fb-dot.online{background:var(--grn);box-shadow:0 0 6px var(--grn)}
+.fb-dot.offline{background:var(--red)}
+/* Loading overlay */
+#loadingOverlay{position:fixed;inset:0;background:rgba(6,3,24,.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.spinner{width:44px;height:44px;border:4px solid rgba(255,215,0,.2);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Profile modal */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:650;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-ov.on{display:flex}
+.modal-bx{background:#13132a;border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:clamp(18px,3vw,26px);max-width:min(340px,95vw);width:100%}
+.prof-av{width:84px;height:84px;border-radius:50%;border:3px solid var(--ora);background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:2em;cursor:pointer;overflow:hidden;margin:0 auto 8px}
+.prof-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 </style>
 </head>
 <body>
 <canvas id="sparkleCanvas"></canvas>
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div style="color:var(--mut);font-size:.9em;margin-top:4px">連接資料庫中…</div>
+  <div style="color:rgba(255,255,255,.3);font-size:.75em;margin-top:8px">若超過10秒請檢查 Firebase 設定</div>
+</div>
 <canvas id="sc"></canvas>
 <div id="warriorOverlay">
   <canvas id="warriorCanvas"></canvas>
@@ -269,12 +421,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 <div id="gameScreen">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-      <div class="pbadge">
+      <div class="pbadge" onclick="openProfileModal()" title="點擊編輯頭貼／改名" style="cursor:pointer">
         <div class="pbadge-avatar" id="tbAv">👤</div>
         <span id="tbname" style="font-weight:700"></span>
         <span id="tbprog" style="color:var(--gold);font-size:.82em"></span>
       </div>
       <span id="tbmo" style="color:var(--mut);font-size:.78em"></span>
+      <span class="fb-status"><span class="fb-dot" id="fbDot"></span><span id="fbStatus">連線中</span></span>
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
       <div class="tabs">
@@ -411,6 +564,21 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   </div>
 </div>
 
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="modal-ov">
+  <div class="modal-bx">
+    <h3 style="color:var(--ora);margin-bottom:16px;text-align:center">✏️ 編輯個人資料</h3>
+    <div class="prof-av" id="profAvPreview" onclick="document.getElementById('profAvatarInput').click()">📷</div>
+    <input type="file" id="profAvatarInput" accept="image/*" style="display:none" onchange="handleProfileAvatar(event)">
+    <div style="text-align:center;font-size:.74em;color:var(--mut);margin-bottom:14px">點擊更換頭貼</div>
+    <div class="fgroup"><label class="fl">角色名稱</label><input class="fi" id="editNameInput" placeholder="輸入新名稱" autocomplete="off"></div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn bg bsm" style="flex:1" onclick="closeProfileModal()">取消</button>
+      <button class="btn bm bsm" style="flex:1" onclick="saveProfile()">儲存 ✓</button>
+    </div>
+  </div>
+</div>
+
 <!-- PENTA MODAL -->
 <div id="pm">
   <div class="pmb">
@@ -423,615 +591,221 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
-// DATA & HELPERS
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
+// FIREBASE CONFIG
+// ════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyAdr_4vgKeV3-M5fE3uMJ-MQSUTScRIefc",
+  authDomain: "case-sprint-13143.firebaseapp.com",
+  databaseURL: "https://case-sprint-13143-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "case-sprint-13143",
+  storageBucket: "case-sprint-13143.firebasestorage.app",
+  messagingSenderId: "452472106582",
+  appId: "1:452472106582:web:a629ef41927ee1196115f7"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ════════════════════════════════════════════
+// CONSTANTS
+// ════════════════════════════════════════════
 const TW_HOLIDAYS=new Set(['2025-01-01','2025-01-27','2025-01-28','2025-01-29','2025-01-30','2025-01-31','2025-02-28','2025-04-04','2025-04-05','2025-05-01','2025-05-02','2025-06-09','2025-09-13','2025-10-10','2026-01-01','2026-01-29','2026-01-30','2026-01-31','2026-02-06','2026-02-28','2026-04-04','2026-05-01','2026-06-20','2026-09-26','2026-10-10']);
 const today=new Date();
 const YM=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`;
 const TODAY=today.toISOString().split('T')[0];
-
 function isWD(d){const dw=new Date(d+'T00:00:00').getDay();return dw!==0&&dw!==6&&!TW_HOLIDAYS.has(d)}
 function getWD(y,m){const r=[];const d=new Date(y,m-1,1);while(d.getMonth()===m-1){const s=d.toISOString().split('T')[0];if(isWD(s))r.push(s);d.setDate(d.getDate()+1)}return r}
 function getWDSF(y,m){return getWD(y,m).filter(d=>d<=TODAY)}
-
 function cW(r){return(r.ja||0)*1+(r.hy||0)*.8+(r.sb||0)*.6+(r.tx||0)*.6}
 
-function save(){try{localStorage.setItem('cs1',JSON.stringify(state))}catch(e){}}
-function load(){try{const d=localStorage.getItem('cs1');if(d)state=JSON.parse(d)}catch(e){}}
-
-let state={players:{}};
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let players={};
 let me=null;
-let pendingAvatar=null; // base64 for new reg
+let pendingAvatar=null;
+let editAvatar=null;
+let _kingImg=null;
+let stones=[];
 
-// BroadcastChannel for multi-tab
-let bc;
-try{bc=new BroadcastChannel('cs1bc')}catch(e){}
-function bcast(t,d){if(bc)try{bc.postMessage({type:t,data:d,from:me})}catch(e){}}
-if(bc)bc.onmessage=evt=>{
-  const{type,data,from}=evt.data;if(from===me)return;
-  load();
-  if(type==='join'||type==='update'){
-    if(!state.players[from])state.players[from]=data.p;
-    else Object.assign(state.players[from],data.p);
-    save();renderExisting();
-    if(me)refreshCurrentTab();
-  }
-  if(type==='delete'){delete state.players[from];save();if(me)refreshCurrentTab();}
-  if(type==='stone'){
-    const p=state.players[from];
-    if(data.target===me){bumpPlayer(me);showToast(`💖 ${p?p.name:'某人'} 投了魅力票給你！`,'danger');}
-    playStone(from,data.target);
-  }
-};
+// ════════════════════════════════════════════
+// FIREBASE INIT
+// ════════════════════════════════════════════
+function initFirebase(){
+  db.ref('.info/connected').on('value',snap=>{
+    const on=snap.val();
+    const dot=document.getElementById('fbDot'),txt=document.getElementById('fbStatus');
+    if(dot)dot.className='fb-dot '+(on?'online':'offline');
+    if(txt)txt.textContent=on?'已連線':'離線';
+  });
+  db.ref('players').on('value',snap=>{
+    players=snap.val()||{};
+    if(me){refreshCurrentTab();updateTopbarProg();}
+    renderExisting();
+  });
+}
 
-// ═══════════════════════════════════════════════
-// AVATAR
-// ═══════════════════════════════════════════════
-function handleAvatarUpload(evt){
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+function getMonthTotal(p){const l=p.logs&&p.logs[YM];if(!l)return 0;return Object.values(l).reduce((s,r)=>s+cW(r),0)}
+function getTotalLeaveHours(p){const l=p.logs&&p.logs[YM];if(!l)return 0;return Object.values(l).reduce((s,r)=>s+(r.leave||0),0)}
+function getEffectiveWD(p){return Math.max(0,getWD(today.getFullYear(),today.getMonth()+1).length-getTotalLeaveHours(p)/8)}
+function getAdjTarget(p){return p.target*getEffectiveWD(p)}
+function getProgress(p){const t=getAdjTarget(p);if(!t)return 0;return Math.min(1,getMonthTotal(p)/t)}
+function getAllMax(){
+  const pl=Object.values(players).filter(p=>p.empId);
+  let a=1,b=1,c=1,d=1,e=1;
+  pl.forEach(p=>{const l=(p.logs&&p.logs[YM])||{};let ja=0,hy=0,sb=0,tx=0;Object.values(l).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});const thr=(p.throwReceived&&p.throwReceived[YM])||0;a=Math.max(a,ja);b=Math.max(b,hy);c=Math.max(c,sb);d=Math.max(d,tx);e=Math.max(e,thr);});
+  return[a,b,c,d,e];
+}
+function makeAvEl(avData,size=38){
+  const w=document.createElement('div');
+  w.style.cssText=`width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(255,255,255,.08)`;
+  if(avData){const img=document.createElement('img');img.src=avData;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';w.appendChild(img);}
+  else w.textContent='👤';
+  return w;
+}
+function resizeImg(dataUrl,maxPx,quality,cb){
+  const img=new Image();img.onload=()=>{const sc=Math.min(1,maxPx/Math.max(img.width,img.height));const cv=document.createElement('canvas');cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL('image/jpeg',quality));};img.src=dataUrl;
+}
+
+// ════════════════════════════════════════════
+// AVATAR UPLOAD
+// ════════════════════════════════════════════
+function handleAvatarUpload(evt,mode){
   const file=evt.target.files[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=e=>{
-    pendingAvatar=e.target.result;
-    const prev=document.getElementById('regAvatarPreview');
-    prev.innerHTML=`<img src="${pendingAvatar}" alt="avatar">`;
-  };
+  reader.onload=e=>resizeImg(e.target.result,200,.72,data=>{
+    if(mode==='reg'){pendingAvatar=data;const p=document.getElementById('regAvatarPreview');p.innerHTML=`<img src="${data}" alt="av">`;}
+  });
+  reader.readAsDataURL(file);
+}
+function handleProfileAvatar(evt){
+  const file=evt.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>resizeImg(e.target.result,200,.72,data=>{
+    editAvatar=data;const p=document.getElementById('profAvPreview');p.innerHTML=`<img src="${data}" alt="av">`;
+  });
   reader.readAsDataURL(file);
 }
 
-function makeAvEl(avData,size=38){
-  const wrap=document.createElement('div');
-  wrap.style.cssText=`width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(255,255,255,.08)`;
-  if(avData){const img=document.createElement('img');img.src=avData;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';wrap.appendChild(img);}
-  else{wrap.textContent='👤';}
-  return wrap;
-}
-
-// ═══════════════════════════════════════════════
-// PROGRESS CALC
-// ═══════════════════════════════════════════════
-function getMonthTotal(p){
-  const l=p.logs&&p.logs[YM];if(!l)return 0;
-  return Object.values(l).reduce((s,r)=>s+cW(r),0);
-}
-
-function getTotalLeaveHours(p){
-  const l=p.logs&&p.logs[YM];if(!l)return 0;
-  return Object.values(l).reduce((s,r)=>s+(r.leave||0),0);
-}
-
-// Effective working days: total workdays in month minus leave days (leave hrs / 8)
-function getEffectiveWD(p){
-  const wdAll=getWD(today.getFullYear(),today.getMonth()+1).length;
-  const leaveDays=getTotalLeaveHours(p)/8;
-  return Math.max(0, wdAll - leaveDays);
-}
-
-function getAdjTarget(p){
-  // Target per day * effective working days
-  return p.target * getEffectiveWD(p);
-}
-
-function getProgress(p){
-  const t=getAdjTarget(p);if(!t)return 0;
-  return Math.min(1,getMonthTotal(p)/t);
-}
-
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 // REGISTER / LOGIN
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 function doReg(){
-  const empId=document.getElementById('rEmp').value.trim();
+  const empId=document.getElementById('rEmp').value.trim().toUpperCase();
   const name=document.getElementById('rName').value.trim();
   const target=parseFloat(document.getElementById('rTarget').value)||0;
   if(empId.length!==6){showToast('員工編號需6碼','danger');return}
   if(!name){showToast('請輸入名稱','danger');return}
   if(target<=0){showToast('請輸入目標案件量','danger');return}
-  if(state.players[empId]){showToast('此員工編號已存在','danger');return}
+  if(players[empId]){showToast('此員工編號已存在','danger');return}
   const colors=['#f7971e','#3498db','#9b59b6','#27ae60','#e74c3c','#f39c12','#1abc9c','#e91e63'];
-  const col=colors[Object.keys(state.players).length%colors.length];
-  state.players[empId]={empId,name,color:col,avatar:pendingAvatar||null,target,logs:{},medals:[],throwReceived:{},reachedGoal:null};
-  save();me=empId;pendingAvatar=null;
-  bcast('join',{p:state.players[empId]});
-  enterGame();
+  const col=colors[Object.keys(players).filter(k=>players[k].empId).length%colors.length];
+  db.ref('players/'+empId).set({empId,name,color:col,avatar:pendingAvatar||'',target,medals:[],throwReceived:{},reachedGoal:''})
+    .then(()=>{pendingAvatar=null;me=empId;sessionStorage.setItem('me',empId);enterGame();showToast('✅ 角色創建成功！');})
+    .catch(err=>showToast('❌ '+err.message,'danger'));
 }
-
 function doLogin(){
-  const empId=document.getElementById('lEmp').value.trim();
-  if(!state.players[empId]){showToast('找不到此員工編號','danger');return}
-  me=empId;enterGame();
+  const empId=document.getElementById('lEmp').value.trim().toUpperCase();
+  if(!players[empId]){showToast('找不到此員工編號','danger');return}
+  me=empId;sessionStorage.setItem('me',empId);enterGame();
 }
-
 function doLogout(){
-  me=null;
+  me=null;sessionStorage.removeItem('me');
   document.getElementById('gameScreen').classList.remove('on');
   document.getElementById('titleScreen').style.display='block';
-  renderExisting();
 }
 
-function renderExisting(){
-  const pl=Object.values(state.players);
-  const ep=document.getElementById('epanel');
-  if(!pl.length){ep.style.display='none';return}
-  ep.style.display='block';
-  const el=document.getElementById('elist');el.innerHTML='';
-  pl.forEach(p=>{
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)';
-    const av=makeAvEl(p.avatar,32);av.style.border='2px solid '+(p.color||'#f7971e');
-    const info=document.createElement('div');
-    info.innerHTML=`<div style="font-weight:700;font-size:.88em">${p.name}</div><div style="font-size:.72em;color:var(--mut)">${p.empId}</div>`;
-    row.appendChild(av);row.appendChild(info);el.appendChild(row);
+// ════════════════════════════════════════════
+// PROFILE EDIT
+// ════════════════════════════════════════════
+function openProfileModal(){
+  if(!me||!players[me])return;
+  const p=players[me];
+  document.getElementById('editNameInput').value=p.name||'';
+  const prev=document.getElementById('profAvPreview');
+  if(p.avatar)prev.innerHTML=`<img src="${p.avatar}" alt="av">`;else prev.textContent='📷';
+  editAvatar=null;
+  document.getElementById('profileModal').classList.add('on');
+}
+function closeProfileModal(){document.getElementById('profileModal').classList.remove('on');}
+function saveProfile(){
+  if(!me)return;
+  const newName=document.getElementById('editNameInput').value.trim();
+  if(!newName){showToast('名稱不能空白','danger');return}
+  const updates={};
+  updates['players/'+me+'/name']=newName;
+  if(editAvatar)updates['players/'+me+'/avatar']=editAvatar;
+  db.ref().update(updates).then(()=>{closeProfileModal();showToast('✅ 資料已更新');updateTopbarBadge();})
+    .catch(err=>showToast('❌ '+err.message,'danger'));
+}
+
+// ════════════════════════════════════════════
+// DELETE
+// ════════════════════════════════════════════
+function openDeleteModal(){
+  if(!me||!players[me])return;
+  document.getElementById('delName').textContent=players[me].name;
+  document.getElementById('deleteModal').classList.add('on');
+}
+function confirmDelete(){
+  document.getElementById('deleteModal').classList.remove('on');
+  db.ref('players/'+me).remove().then(()=>{
+    me=null;sessionStorage.removeItem('me');
+    document.getElementById('gameScreen').classList.remove('on');
+    document.getElementById('titleScreen').style.display='block';
+    showToast('角色已刪除');
   });
 }
 
+// ════════════════════════════════════════════
+// ENTER GAME
+// ════════════════════════════════════════════
 function enterGame(){
   document.getElementById('titleScreen').style.display='none';
   document.getElementById('gameScreen').classList.add('on');
-  const p=state.players[me];
-  document.getElementById('tbname').textContent=p.name;
+  updateTopbarBadge();
   document.getElementById('tbmo').textContent=`${today.getFullYear()}年${today.getMonth()+1}月`;
-  // Topbar avatar
-  const tbAv=document.getElementById('tbAv');
-  if(p.avatar){tbAv.innerHTML=`<img src="${p.avatar}" alt="av">`;}else{tbAv.textContent='👤';}
-  checkReset();
+  document.getElementById('ddlabel').textContent=TODAY;
   switchTab('home');
 }
-
-// ═══════════════════════════════════════════════
-// KING BANNER
-// ═══════════════════════════════════════════════
-const CONFETTI_CHARS=['🌟','✨','🎊','🎉','💫','⭐','🌈','🎈'];
-function renderVoteTab(){
-  // Update left count
-  const left=getCharmLeft();
-  const lvEl=document.getElementById('voteCharmLeft');
-  if(lvEl) lvEl.textContent=`今日剩餘 ${left} 票`;
-
-  // Vote grid - all players
-  const grid=document.getElementById('voteGrid');
-  if(!grid)return;
-  grid.innerHTML='';
-  const players=Object.values(state.players);
-
-  players.forEach(p=>{
-    const charmCount=(p.throwReceived&&p.throwReceived[YM])||0;
-    const isSelf=p.empId===me;
-    const card=document.createElement('div');
-    card.style.cssText='background:rgba(255,255,255,.04);border:1px solid rgba(233,30,99,.18);border-radius:16px;padding:16px;text-align:center;transition:all .2s';
-
-    const av=makeAvEl(p.avatar,72);
-    av.style.cssText+=`;margin:0 auto 10px;border:3px solid ${p.color||'#e91e63'}`;
-
-    const info=document.createElement('div');
-    const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
-    info.innerHTML=`
-      <div style="font-weight:700;font-size:.95em;margin-bottom:3px">${p.name} ${medals}</div>
-      <div style="font-size:.78em;color:#e91e63;margin-bottom:10px">💖 ${charmCount} 票</div>
-      <button onclick="doCharm('${p.empId}',event)"
-        style="background:${left<=0?'rgba(100,100,100,.3)':'linear-gradient(135deg,#e91e63,#c2185b)'};
-        border:none;border-radius:16px;color:${left<=0?'#888':'#fff'};font-size:.85em;font-weight:700;
-        padding:8px 20px;cursor:${left<=0?'not-allowed':'pointer'};touch-action:manipulation;width:100%"
-        ${left<=0?'disabled':''}>
-        ${isSelf?'投給自己 💖':'投票 💖'}
-      </button>`;
-
-    card.appendChild(av);
-    card.appendChild(info);
-    grid.appendChild(card);
-  });
-
-  // Vote leaderboard
-  const board=document.getElementById('voteBoard');
-  if(!board)return;
-  board.innerHTML='';
-  const sorted=players.slice()
-    .map(p=>({p,v:(p.throwReceived&&p.throwReceived[YM])||0}))
-    .sort((a,b)=>b.v-a.v);
-
-  if(!sorted.some(x=>x.v>0)){
-    board.innerHTML='<div style="color:var(--mut);font-size:.85em;padding:12px 0">本月尚無投票記錄</div>';
-    return;
-  }
-
-  const maxV=sorted[0].v||1;
-  sorted.forEach(({p,v},i)=>{
-    if(v===0&&i>2)return;
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(233,30,99,.06);border:1px solid rgba(233,30,99,.15);border-radius:12px;padding:10px 14px';
-    const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;
-    const av=makeAvEl(p.avatar,36);av.style.border=`2px solid ${p.color||'#e91e63'}`;
-    const info=document.createElement('div');info.style.flex='1';
-    info.innerHTML=`<div style="font-weight:700;font-size:.88em">${rank} ${p.name}</div>
-      <div style="height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-top:4px">
-        <div style="width:${Math.round(v/maxV*100)}%;height:100%;background:linear-gradient(90deg,#e91e63,#ff6090);border-radius:3px;transition:width .8s"></div>
-      </div>`;
-    const cnt=document.createElement('div');
-    cnt.style.cssText='color:#e91e63;font-weight:700;font-size:1em;flex-shrink:0';
-    cnt.textContent=`💖 ${v}`;
-    row.appendChild(av);row.appendChild(info);row.appendChild(cnt);
-    board.appendChild(row);
-  });
+function updateTopbarBadge(){
+  if(!me||!players[me])return;
+  const p=players[me];
+  document.getElementById('tbname').textContent=p.name;
+  const tbAv=document.getElementById('tbAv');
+  if(p.avatar)tbAv.innerHTML=`<img src="${p.avatar}" alt="av">`;else tbAv.textContent='👤';
+}
+function updateTopbarProg(){
+  if(!me||!players[me])return;
+  document.getElementById('tbprog').textContent=` ${Math.round(getProgress(players[me])*100)}%`;
 }
 
-function renderTitlesRow(){
-  const tr=document.getElementById('titlesRow');if(!tr)return;
-  tr.innerHTML='';
-  const players=Object.values(state.players);
-  if(!players.length)return;
-
-  // Find each title holder
-  let jaBest={p:null,v:0},hyBest={p:null,v:0},thrBest={p:null,v:0};
-  players.forEach(p=>{
-    const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0;
-    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;});
-    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
-    if(ja>jaBest.v)jaBest={p,v:ja};
-    if(hy>hyBest.v)hyBest={p,v:hy};
-    if(thr>thrBest.v)thrBest={p,v:thr};
-  });
-
-  // Pentagon warriors
-  const warriors=getPentagonWarriors();
-
-  const items=[
-    {icon:'⚡',label:'結案王',best:jaBest,unit:'件',grad:'linear-gradient(135deg,#f7971e,#ffd200)',glow:'rgba(247,151,30,.35)'},
-    {icon:'🌊',label:'緩議王',best:hyBest,unit:'件',grad:'linear-gradient(135deg,#0072ff,#00c6ff)',glow:'rgba(0,180,255,.35)'},
-    {icon:'💖',label:'人氣王',best:thrBest,unit:'票',grad:'linear-gradient(135deg,#e91e63,#ff6090)',glow:'rgba(233,30,99,.35)'},
-  ];
-
-  items.forEach(({icon,label,best,unit,grad,glow})=>{
-    const card=document.createElement('div');
-    card.style.cssText=`flex:1;min-width:120px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 12px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s;box-shadow:0 0 20px ${glow}`;
-    card.onmouseenter=()=>card.style.transform='translateY(-3px)';
-    card.onmouseleave=()=>card.style.transform='';
-
-    // Gradient glow top
-    const glowDiv=document.createElement('div');
-    glowDiv.style.cssText=`position:absolute;top:0;left:0;right:0;height:3px;background:${grad};border-radius:16px 16px 0 0`;
-    card.appendChild(glowDiv);
-
-    if(best.p){
-      const av=makeAvEl(best.p.avatar,52);
-      av.style.cssText+=`;margin:4px auto 8px;border:3px solid transparent;background:${grad};box-shadow:0 0 12px ${glow}`;
-      // Wrap to clip
-      const avWrap=document.createElement('div');
-      avWrap.style.cssText='width:52px;height:52px;border-radius:50%;margin:4px auto 8px;overflow:hidden;position:relative';
-      if(best.p.avatar){const img=document.createElement('img');img.src=best.p.avatar;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';avWrap.appendChild(img);}
-      else{avWrap.style.background='rgba(255,255,255,.08)';avWrap.style.display='flex';avWrap.style.alignItems='center';avWrap.style.justifyContent='center';avWrap.textContent='👤';}
-      avWrap.style.border=`3px solid transparent`;
-      avWrap.style.backgroundImage=grad;
-      card.appendChild(avWrap);
-      const nameEl=document.createElement('div');
-      nameEl.style.cssText='font-weight:700;font-size:.88em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
-      nameEl.textContent=best.p.name;
-      const valEl=document.createElement('div');
-      valEl.style.cssText=`font-size:.75em;background:${grad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700`;
-      valEl.textContent=`${best.v} ${unit}`;
-      const lblEl=document.createElement('div');
-      lblEl.style.cssText='font-size:.7em;color:var(--mut);margin-bottom:2px';
-      lblEl.innerHTML=`${icon} ${label}`;
-      card.appendChild(lblEl);card.appendChild(nameEl);card.appendChild(valEl);
-    } else {
-      card.innerHTML+=`<div style="font-size:1.6em;margin:6px 0">${icon}</div><div style="font-size:.8em;font-weight:700;margin-bottom:4px">${label}</div><div style="font-size:.72em;color:var(--mut)">暫無</div>`;
-    }
-    tr.appendChild(card);
-  });
-
-  // Pentagon warrior card
-  if(warriors.length>0){
-    const wCard=document.createElement('div');
-    wCard.style.cssText='flex:1;min-width:120px;border-radius:16px;padding:14px 12px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s;background:linear-gradient(135deg,#0a0520,#1a0540);box-shadow:0 0 30px rgba(255,215,0,.25),0 0 60px rgba(180,60,255,.2)';
-    wCard.onmouseenter=()=>wCard.style.transform='translateY(-3px)';
-    wCard.onmouseleave=()=>wCard.style.transform='';
-    // Rainbow border top
-    const rb=document.createElement('div');
-    rb.style.cssText='position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ffd700,#e040fb,#00bcd4,#ffd700);animation:borderFlow 2s linear infinite;border-radius:16px 16px 0 0';
-    wCard.appendChild(rb);
-    const star=document.createElement('div');star.style.cssText='font-size:1.6em;margin:4px 0 6px;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 8px #ffd700)';star.textContent='⭐';
-    wCard.appendChild(star);
-    const lbl=document.createElement('div');lbl.style.cssText='font-size:.72em;color:#ffd700;margin-bottom:6px;font-weight:700';lbl.textContent='五邊形戰士';
-    wCard.appendChild(lbl);
-    warriors.forEach(w=>{
-      const avWrap=document.createElement('div');
-      avWrap.style.cssText='width:48px;height:48px;border-radius:50%;margin:2px auto 4px;overflow:hidden;border:2px solid #ffd700;box-shadow:0 0 10px rgba(255,215,0,.5)';
-      if(w.avatar){const img=document.createElement('img');img.src=w.avatar;img.style.cssText='width:100%;height:100%;object-fit:cover';avWrap.appendChild(img);}
-      else{avWrap.style.background='rgba(255,255,255,.08)';avWrap.style.display='flex';avWrap.style.alignItems='center';avWrap.style.justifyContent='center';avWrap.textContent='👤';}
-      const nm=document.createElement('div');nm.style.cssText='font-size:.75em;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';nm.textContent=w.name;
-      wCard.appendChild(avWrap);wCard.appendChild(nm);
-    });
-    tr.appendChild(wCard);
-  }
-}
-
-function renderCharmBoard(){
-  const el=document.getElementById('charmBoard');if(!el)return;
-  const players=Object.values(state.players)
-    .map(p=>({p,v:(p.throwReceived&&p.throwReceived[YM])||0}))
-    .sort((a,b)=>b.v-a.v).filter(x=>x.v>0);
-  el.innerHTML='';
-  if(!players.length){el.innerHTML='<div style="color:var(--mut);font-size:.85em">尚無魅力票記錄</div>';return;}
-  players.forEach(({p,v},i)=>{
-    const item=document.createElement('div');
-    item.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(233,30,99,.08);border:1px solid rgba(233,30,99,.2);border-radius:12px;padding:8px 14px';
-    const rank=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':`${i+1}. `;
-    const av=makeAvEl(p.avatar,30);av.style.border=`2px solid ${p.color||'#e91e63'}`;
-    item.appendChild(av);
-    const txt=document.createElement('span');txt.style.fontSize='.85em';
-    txt.innerHTML=`${rank}<b>${p.name}</b> <span style="color:#e91e63">💖 ${v}</span>`;
-    item.appendChild(txt);el.appendChild(item);
-  });
-}
-
-function drawKingBackground(king){
-  const canvas=document.getElementById('kingBgCanvas');
-  if(!canvas)return;
-  const banner=document.getElementById('kingBanner');
-  const W=banner.clientWidth||600;
-  const H=banner.clientHeight||360;
-  canvas.width=W;canvas.height=H;
-  const ctx=canvas.getContext('2d');
-  ctx.clearRect(0,0,W,H);
-  const color=king.color||'#ffd700';
-
-  function paintFull(){
-    ctx.clearRect(0,0,W,H);
-    if(king.avatar&&_kingImg&&_kingImg.complete&&_kingImg.naturalWidth>0){
-      const img=_kingImg;
-      // Layer 1: Full-bleed blurred avatar
-      ctx.save();
-      ctx.filter='blur(40px) saturate(2) brightness(.8)';
-      ctx.globalAlpha=0.45;
-      const scale=Math.max(W/img.width,H/img.height)*1.6;
-      const sw=img.width*scale,sh=img.height*scale;
-      ctx.drawImage(img,(W-sw)/2,(H-sh)/2,sw,sh);
-      ctx.filter='none';ctx.globalAlpha=1;
-      ctx.restore();
-    }
-
-    // Layer 2: Deep dark gradient overlay
-    const ov=ctx.createLinearGradient(0,0,0,H);
-    ov.addColorStop(0,'rgba(6,3,24,.72)');
-    ov.addColorStop(.45,'rgba(6,3,24,.52)');
-    ov.addColorStop(1,'rgba(6,3,24,.78)');
-    ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
-
-    // Layer 3: Color radial bloom from bottom sides
-    const bl=ctx.createRadialGradient(W*.15,H*.9,0,W*.15,H*.9,W*.55);
-    bl.addColorStop(0,hexToRgba(color,.18));bl.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=bl;ctx.fillRect(0,0,W,H);
-    const br=ctx.createRadialGradient(W*.85,H*.9,0,W*.85,H*.9,W*.55);
-    br.addColorStop(0,'rgba(180,60,255,.14)');br.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=br;ctx.fillRect(0,0,W,H);
-
-    if(king.avatar&&_kingImg&&_kingImg.complete&&_kingImg.naturalWidth>0){
-      const img=_kingImg;
-      // Layer 4: Floating bokeh avatar circles
-      const pos=[
-        {xr:.06,yr:.22,sz:44,a:.28,bl:6},{xr:.94,yr:.22,sz:40,a:.24,bl:8},
-        {xr:.12,yr:.68,sz:34,a:.2,bl:10},{xr:.88,yr:.68,sz:36,a:.22,bl:8},
-        {xr:.03,yr:.5,sz:24,a:.14,bl:14},{xr:.97,yr:.5,sz:26,a:.15,bl:13},
-        {xr:.2,yr:.1,sz:20,a:.12,bl:16},{xr:.8,yr:.1,sz:18,a:.11,bl:18},
-      ];
-      pos.forEach(p=>{
-        const x=p.xr*W,y=p.yr*H;
-        ctx.save();
-        ctx.beginPath();ctx.arc(x,y,p.sz,0,Math.PI*2);ctx.clip();
-        ctx.filter=`blur(${p.bl}px)`;ctx.globalAlpha=p.a;
-        ctx.drawImage(img,x-p.sz,y-p.sz,p.sz*2,p.sz*2);
-        ctx.filter='none';ctx.globalAlpha=1;ctx.restore();
-        // Glow ring
-        ctx.save();ctx.globalAlpha=p.a*.9;
-        const rg=ctx.createRadialGradient(x,y,p.sz*.7,x,y,p.sz+8);
-        rg.addColorStop(0,hexToRgba(color,.6));rg.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.beginPath();ctx.arc(x,y,p.sz+8,0,Math.PI*2);ctx.fillStyle=rg;ctx.fill();
-        ctx.restore();
-      });
-    }
-
-    // Layer 5: Sparkle decorations
-    drawKingSparkles(ctx,W,H,color);
-
-    // Layer 6: Light leak at top center
-    const ll=ctx.createRadialGradient(W/2,-10,0,W/2,-10,W*.4);
-    ll.addColorStop(0,hexToRgba(color,.22));ll.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=ll;ctx.fillRect(0,0,W,H);
-  }
-
-  if(king.avatar){
-    if(!_kingImg||_kingImg._src!==king.avatar){
-      _kingImg=new Image();_kingImg._src=king.avatar;
-      _kingImg.onload=()=>paintFull();
-      _kingImg.src=king.avatar;
-    } else {paintFull();}
-  } else {
-    paintFull();
-  }
-}
-let _kingImg=null;
-
-function drawKingSparkles(ctx,W,H,color){
-  const sparks=[
-    {x:.07,y:.12,type:'star4',sz:10},{x:.93,y:.1,type:'star4',sz:9},
-    {x:.18,y:.88,type:'star6',sz:9},{x:.82,y:.86,type:'star6',sz:8},
-    {x:.03,y:.45,type:'diamond',sz:8},{x:.97,y:.45,type:'diamond',sz:8},
-    {x:.32,y:.05,type:'cross',sz:7},{x:.68,y:.05,type:'cross',sz:7},
-    {x:.5,y:.04,type:'star4',sz:12},
-    {x:.28,y:.95,type:'dot',sz:4},{x:.72,y:.93,type:'dot',sz:4},
-    {x:.12,y:.55,type:'dot',sz:3},{x:.88,y:.55,type:'dot',sz:3},
-  ];
-  sparks.forEach(s=>{
-    const x=s.x*W,y=s.y*H,sz=s.sz;
-    ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.globalAlpha=.6;
-    ctx.shadowBlur=12;ctx.shadowColor=color;
-    if(s.type==='star4'){
-      ctx.lineWidth=1.8;
-      for(let i=0;i<4;i++){const a=i*Math.PI/2-Math.PI/4;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*sz,y+Math.sin(a)*sz);ctx.stroke();}
-      ctx.beginPath();ctx.arc(x,y,sz*.25,0,Math.PI*2);ctx.fill();
-    }else if(s.type==='star6'){
-      ctx.lineWidth=1.5;
-      for(let i=0;i<6;i++){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*sz,y+Math.sin(a)*sz);ctx.stroke();}
-      ctx.beginPath();ctx.arc(x,y,sz*.22,0,Math.PI*2);ctx.fill();
-    }else if(s.type==='diamond'){
-      ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x,y-sz);ctx.lineTo(x+sz*.6,y);ctx.lineTo(x,y+sz);ctx.lineTo(x-sz*.6,y);ctx.closePath();ctx.stroke();
-    }else if(s.type==='cross'){
-      ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.moveTo(x-sz,y);ctx.lineTo(x+sz,y);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(x,y-sz);ctx.lineTo(x,y+sz);ctx.stroke();
-    }else{
-      ctx.beginPath();ctx.arc(x,y,sz,0,Math.PI*2);ctx.fill();
-    }
-    ctx.restore();
-  });
-  // Horizontal light leaks
-  [.28,.52,.76].forEach((yp,i)=>{
-    const g=ctx.createLinearGradient(0,yp*H,W,yp*H);
-    g.addColorStop(0,'rgba(255,255,255,0)');
-    g.addColorStop(.35,hexToRgba(color,i===1?.1:.07));
-    g.addColorStop(.65,hexToRgba(color,i===1?.1:.07));
-    g.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.fillStyle=g;ctx.fillRect(0,yp*H-1.5,W,3);
-  });
-  // Corner vignette glow
-  [[0,0],[W,0],[0,H],[W,H]].forEach(([cx2,cy2])=>{
-    const cg=ctx.createRadialGradient(cx2,cy2,0,cx2,cy2,W*.35);
-    cg.addColorStop(0,hexToRgba(color,.08));cg.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=cg;ctx.fillRect(0,0,W,H);
-  });
-}
-
-function hexToRgba(hex,a){
-  if(hex.startsWith('#')){
-    const r=parseInt(hex.slice(1,3),16);const g=parseInt(hex.slice(3,5),16);const b=parseInt(hex.slice(5,7),16);
-    return `rgba(${r},${g},${b},${a})`;
-  }
-  return `rgba(200,150,255,${a})`;
-}
-
-function renderCharmLeft(){
-  const el=document.getElementById('charmLeftDisplay');
-  if(!el||!me)return;
-  const left=getCharmLeft();
-  el.textContent=`💖 今日魅力票剩餘 ${left} 票`;
-}
-
-function renderKingBanner(){
-  const players=Object.values(state.players);
-  if(!players.length){
-    document.getElementById('kingName').textContent='尚無參賽者';
-    document.getElementById('kingScore').textContent='快來加入吧！';
-    return;
-  }
-  const sorted=players.slice().sort((a,b)=>getProgress(b)-getProgress(a));
-  const king=sorted[0];
-  const prog=Math.round(getProgress(king)*100);
-  const total=getMonthTotal(king).toFixed(1);
-  const adjT=getAdjTarget(king).toFixed(0);
-
-  // Avatar
-  const av=document.getElementById('kingAv');
-  if(king.avatar){av.innerHTML=`<img src="${king.avatar}" alt="king" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;}
-  else{av.innerHTML='🏆';}
-  av.style.border=`4px solid ${king.color||'var(--gold)'}`;
-
-  document.getElementById('kingName').textContent=king.name;
-  document.getElementById('kingScore').textContent=`加權 ${total} ／ 目標 ${adjT}（${prog}%）`;
-
-  // Medals
-  const mb=document.getElementById('kingBadges');
-  const medals=(king.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉');
-  mb.innerHTML=medals.slice(-5).map(m=>`<span style="font-size:1.4em">${m}</span>`).join('');
-
-  // Draw avatar background canvas
-  drawKingBackground(king);
-
-  // Resize observer for canvas quality
-  const banner=document.getElementById('kingBanner');
-  if(banner&&!banner._hasObserver){
-    banner._hasObserver=true;
-    if(window.ResizeObserver){
-      new ResizeObserver(()=>{if(state.players&&me)drawKingBackground(sorted[0]);}).observe(banner);
-    }
-  }
-
-  // Animated stars
-  const sb=document.getElementById('starBg');sb.innerHTML='';
-  for(let i=0;i<14;i++){
-    const star=document.createElement('div');
-    const x=Math.random()*100,y=Math.random()*100;
-    const sz=0.7+Math.random()*1.2,delay=Math.random()*3,dur=2+Math.random()*2;
-    star.style.cssText=`position:absolute;left:${x}%;top:${y}%;font-size:${sz}em;animation:float ${dur}s ${delay}s ease-in-out infinite;opacity:${0.3+Math.random()*.5}`;
-    star.textContent=CONFETTI_CHARS[i%CONFETTI_CHARS.length];
-    sb.appendChild(star);
-  }
-}
-
-// ═══════════════════════════════════════════════
-// PLAYERS GRID (home)
-// ═══════════════════════════════════════════════
-function renderPlayersGrid(){
-  const players=Object.values(state.players).sort((a,b)=>getProgress(b)-getProgress(a));
-  const grid=document.getElementById('playersGrid');grid.innerHTML='';
-  players.forEach(p=>{
-    const prog=Math.round(getProgress(p)*100);
-    const total=getMonthTotal(p).toFixed(1);
-    const adjT=getAdjTarget(p).toFixed(0);
-    const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
-    const card=document.createElement('div');card.className='player-card';
-    const av=makeAvEl(p.avatar,64);
-    av.style.cssText+=`;margin:0 auto 10px;border:3px solid ${p.color||'#f7971e'}`;
-    card.appendChild(av);
-    const inner=document.createElement('div');
-    const charmCount=(p.throwReceived&&p.throwReceived[YM])||0;
-    const isWarrior=getPentagonWarriors().some(w=>w.empId===p.empId);
-    inner.innerHTML=`<div class="pc-name">${p.name} ${medals}${isWarrior?' <span title="五邊形戰士" style="font-size:.9em">⭐</span>':''}</div>
-      <div class="pc-sub">${p.empId} ｜ 目標 ${p.target}/日</div>
-      <div class="pc-prog-wrap"><div class="pc-prog-fill" style="width:${prog}%;background:${p.color||'#f7971e'}"></div></div>
-      <div style="font-size:.75em;color:var(--mut)">進度 <b style="color:${p.color||'var(--gold)'}">${prog}%</b> ｜ ${total}/${adjT}</div>
-      <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:.75em;color:#e91e63">💖 魅力票 ${charmCount}</span>
-        ${p.empId!==me?`<button class="charm-btn" onclick="doCharm('${p.empId}',event)" style="background:linear-gradient(135deg,#e91e63,#c2185b);border:none;border-radius:14px;color:#fff;font-size:.72em;font-weight:700;padding:4px 10px;cursor:pointer;touch-action:manipulation">投票 💖</button>`:`<button class="charm-btn" onclick="doCharm('${p.empId}',event)" style="background:linear-gradient(135deg,#e91e63,#c2185b);border:none;border-radius:14px;color:#fff;font-size:.72em;font-weight:700;padding:4px 10px;cursor:pointer;touch-action:manipulation">投票 💖</button>`}
-      </div>`;
-    card.appendChild(inner);
-    grid.appendChild(card);
-  });
-}
-
-// ═══════════════════════════════════════════════
-// DAILY INPUT
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
+// DAILY
+// ════════════════════════════════════════════
 function adj(id,d){const el=document.getElementById(id);el.value=Math.max(0,(parseInt(el.value)||0)+d);updDW();}
 function adjLeave(d){const el=document.getElementById('ileave');el.value=Math.max(0,Math.min(8,(parseFloat(el.value)||0)+d));updDW();}
-
 function updDW(){
-  const ja=+document.getElementById('ija').value||0;
-  const hy=+document.getElementById('ihy').value||0;
-  const sb=+document.getElementById('isb').value||0;
-  const tx=+document.getElementById('itx').value||0;
+  const ja=+document.getElementById('ija').value||0,hy=+document.getElementById('ihy').value||0;
+  const sb=+document.getElementById('isb').value||0,tx=+document.getElementById('itx').value||0;
   const leave=+document.getElementById('ileave').value||0;
-  const leaveDays=(leave/8).toFixed(2);
-  document.getElementById('leaveDays').textContent=leave>0?`= ${leaveDays} 天`:'';
+  document.getElementById('leaveDays').textContent=leave>0?`= ${(leave/8).toFixed(2)} 天`:'';
   document.getElementById('dwsum').textContent=`今日加權合計：${(ja+hy*.8+sb*.6+tx*.6).toFixed(1)}`;
-
-  // Show adjusted target
-  const p=state.players[me];if(!p)return;
-  // estimate new effective days if today's leave is applied
+  if(!me||!players[me])return;
+  const p=players[me];
   const wdAll=getWD(today.getFullYear(),today.getMonth()+1).length;
-  const otherLeaveDays=getOtherLeaveHours(p)/8;
-  const effDays=Math.max(0,wdAll-otherLeaveDays-leave/8);
-  const adjT=(p.target*effDays).toFixed(1);
-  document.getElementById('adjTarget').textContent=leave>0?`調整後月目標：${adjT} 件`:'';
+  const l=(p.logs&&p.logs[YM])||{};
+  const otherLeave=Object.entries(l).filter(([d])=>d!==TODAY).reduce((s,[,r])=>s+(r.leave||0),0)/8;
+  const effDays=Math.max(0,wdAll-otherLeave-leave/8);
+  document.getElementById('adjTarget').textContent=leave>0?`調整後月目標：${(p.target*effDays).toFixed(1)} 件`:'';
 }
-
-function getOtherLeaveHours(p){
-  // Leave hours from all days EXCEPT today
-  const l=p.logs&&p.logs[YM];if(!l)return 0;
-  return Object.entries(l).filter(([d])=>d!==TODAY).reduce((s,[,r])=>s+(r.leave||0),0);
-}
-
 function renderDaily(){
   document.getElementById('ddlabel').textContent=TODAY;
-  const p=state.players[me];const logs=(p.logs&&p.logs[YM])||{};const tl=logs[TODAY];
+  const p=players[me];if(!p)return;
+  const logs=(p.logs&&p.logs[YM])||{};const tl=logs[TODAY];
   document.getElementById('already').style.display=tl?'block':'none';
   document.getElementById('ija').value=tl?tl.ja||0:0;
   document.getElementById('ihy').value=tl?tl.hy||0:0;
@@ -1040,555 +814,365 @@ function renderDaily(){
   document.getElementById('ileave').value=tl?tl.leave||0:0;
   updDW();renderLog();
 }
-
 function submitDaily(){
-  const p=state.players[me];
-  if(!p.logs)p.logs={};if(!p.logs[YM])p.logs[YM]={};
-  const rec={
-    ja:+document.getElementById('ija').value||0,
-    hy:+document.getElementById('ihy').value||0,
-    sb:+document.getElementById('isb').value||0,
-    tx:+document.getElementById('itx').value||0,
-    leave:+document.getElementById('ileave').value||0
-  };
-  p.logs[YM][TODAY]=rec;
-  // Check target
-  const prog=getProgress(p);
-  if(prog>=1&&!p.reachedGoal){
-    p.reachedGoal=YM;
-    const cnt=Object.values(state.players).filter(x=>x.reachedGoal===YM).length;
+  if(!me)return;
+  const rec={ja:+document.getElementById('ija').value||0,hy:+document.getElementById('ihy').value||0,sb:+document.getElementById('isb').value||0,tx:+document.getElementById('itx').value||0,leave:+document.getElementById('ileave').value||0};
+  const updates={};updates[`players/${me}/logs/${YM}/${TODAY}`]=rec;
+  const p=players[me];const tl=JSON.parse(JSON.stringify((p.logs&&p.logs[YM])||{}));tl[TODAY]=rec;
+  const tt=Object.values(tl).reduce((s,r)=>s+cW(r),0);const adjT=getAdjTarget(p);
+  if(adjT>0&&tt/adjT>=1&&!p.reachedGoal){
+    const cnt=Object.values(players).filter(x=>x.reachedGoal===YM).length+1;
     const m=cnt===1?'gold':cnt===2?'silver':'bronze';
-    if(!p.medals)p.medals=[];p.medals.push(m);
+    updates[`players/${me}/medals`]=[...(Array.isArray(p.medals)?p.medals:[]),m];
+    updates[`players/${me}/reachedGoal`]=YM;
     showToast(`🎉 達標！獲得 ${m==='gold'?'🥇金牌':m==='silver'?'🥈銀牌':'🥉銅牌'}！`,'success');
   }
-  save();bcast('update',{p});
-  renderDaily();
-  checkWarriorCelebration();
-  showToast('✅ 今日記錄已儲存');
-  // Also refresh home if on home
-  document.getElementById('tbprog').textContent=` ${Math.round(getProgress(p)*100)}%`;
+  db.ref().update(updates).then(()=>{showToast('✅ 今日記錄已儲存');checkWarriorCelebration();}).catch(err=>showToast('❌ '+err.message,'danger'));
 }
-
 function renderLog(){
-  const p=state.players[me];const logs=(p.logs&&p.logs[YM])||{};
-  const wd=getWDSF(today.getFullYear(),today.getMonth()+1);
-  document.getElementById('logbody').innerHTML=wd.slice().reverse().map(d=>{
-    const r=logs[d];
-    if(!r)return`<tr><td style="color:var(--mut)">${d}</td><td colspan="6" style="color:rgba(255,255,255,.15)">未輸入</td></tr>`;
-    return`<tr><td>${d}</td><td>${r.ja||0}</td><td>${r.hy||0}</td><td>${r.sb||0}</td><td>${r.tx||0}</td><td>${r.leave||0}</td><td style="color:var(--ora);font-weight:700">${cW(r).toFixed(1)}</td></tr>`;
-  }).join('');
-  const total=getMonthTotal(p);const adjT=getAdjTarget(p).toFixed(0);
-  const leaveTot=(getTotalLeaveHours(p)/8).toFixed(2);
-  document.getElementById('logsum').innerHTML=`加權累計 <b style="color:var(--gold)">${total.toFixed(1)}</b> ／ 調整目標 <b>${adjT}</b>（扣請假 ${leaveTot} 天）｜ <b style="color:var(--ora)">${Math.round(getProgress(p)*100)}%</b>`;
+  const p=players[me];if(!p)return;
+  const logs=(p.logs&&p.logs[YM])||{};const wd=getWDSF(today.getFullYear(),today.getMonth()+1);
+  document.getElementById('logbody').innerHTML=wd.slice().reverse().map(d=>{const r=logs[d];if(!r)return`<tr><td style="color:var(--mut)">${d}</td><td colspan="6" style="color:rgba(255,255,255,.15)">未輸入</td></tr>`;return`<tr><td>${d}</td><td>${r.ja||0}</td><td>${r.hy||0}</td><td>${r.sb||0}</td><td>${r.tx||0}</td><td>${r.leave||0}</td><td style="color:var(--ora);font-weight:700">${cW(r).toFixed(1)}</td></tr>`;}).join('');
+  const total=getMonthTotal(p);document.getElementById('logsum').innerHTML=`加權累計 <b style="color:var(--gold)">${total.toFixed(1)}</b> ／ 調整目標 <b>${getAdjTarget(p).toFixed(0)}</b>（扣請假 ${(getTotalLeaveHours(p)/8).toFixed(2)} 天）｜ <b style="color:var(--ora)">${Math.round(getProgress(p)*100)}%</b>`;
 }
 
-// ═══════════════════════════════════════════════
-// DELETE
-// ═══════════════════════════════════════════════
-function openDeleteModal(){
-  if(!me||!state.players[me])return;
-  document.getElementById('delName').textContent=state.players[me].name;
-  document.getElementById('deleteModal').style.display='flex';
+// ════════════════════════════════════════════
+// CHARM VOTE
+// ════════════════════════════════════════════
+function getCharmLeft(){const k=`charm1_${me}_${TODAY}`;return Math.max(0,3-parseInt(localStorage.getItem(k)||'0'));}
+function doCharm(targetId,evt){
+  if(evt)evt.stopPropagation();if(!me)return;
+  const left=getCharmLeft();if(left<=0){showToast('今日已用完3票！','danger');return}
+  const tp=players[targetId];if(!tp)return;
+  const cur=(tp.throwReceived&&tp.throwReceived[YM])||0;
+  db.ref(`players/${targetId}/throwReceived/${YM}`).set(cur+1).then(()=>{
+    localStorage.setItem(`charm1_${me}_${TODAY}`,String(3-left+1));
+    showToast(`💖 已投票給 ${tp.name}！剩餘 ${left-1} 票`,'success');
+    playCharm();
+  }).catch(err=>showToast('❌ '+err.message,'danger'));
 }
-function confirmDelete(){
-  document.getElementById('deleteModal').style.display='none';
-  deleteMyChar();
-}
-function deleteMyChar(){
-  if(!confirm(`確定刪除「${state.players[me].name}」？資料無法恢復！`))return;
-  bcast('delete',{});delete state.players[me];save();me=null;
-  document.getElementById('gameScreen').classList.remove('on');
-  document.getElementById('titleScreen').style.display='block';
-  renderExisting();showToast('角色已刪除');
+function playCharm(){
+  const cv=document.getElementById('sc');cv.style.display='block';cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const W=cv.width,H=cv.height;const hearts=[];
+  for(let i=0;i<8;i++)hearts.push({x:W/2+(-60+Math.random()*120),y:H/2,vy:-2-Math.random()*2,vx:(-1+Math.random()*2),t:0,dur:50});
+  function a(){const ctx=cv.getContext('2d');ctx.clearRect(0,0,W,H);hearts.forEach(h=>{h.t++;h.x+=h.vx;h.y+=h.vy;ctx.save();ctx.globalAlpha=1-h.t/h.dur;ctx.font=`${18+h.t*.3}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('💖',h.x,h.y);ctx.restore();});if(hearts.some(h=>h.t<h.dur))requestAnimationFrame(a);else{cv.style.display='none';}}
+  a();
 }
 
-// ═══════════════════════════════════════════════
-// STATS + PENTAGON
-// ═══════════════════════════════════════════════
-// For pentagon: use max of ALL players as the 100% baseline
-function getAllMax(){
-  const players=Object.values(state.players);
-  let maxJa=1,maxHy=1,maxSb=1,maxTx=1,maxThr=1;
-  players.forEach(p=>{
-    const logs=(p.logs&&p.logs[YM])||{};
-    let ja=0,hy=0,sb=0,tx=0;
-    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
-    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
-    maxJa=Math.max(maxJa,ja);maxHy=Math.max(maxHy,hy);maxSb=Math.max(maxSb,sb);
-    maxTx=Math.max(maxTx,tx);maxThr=Math.max(maxThr,thr);
+// ════════════════════════════════════════════
+// KING BANNER + BACKGROUND
+// ════════════════════════════════════════════
+function renderKingBanner(){
+  const pl=Object.values(players).filter(p=>p.empId);
+  if(!pl.length){document.getElementById('kingName').textContent='尚無參賽者';document.getElementById('kingScore').textContent='快來加入！';return}
+  const sorted=pl.sort((a,b)=>getProgress(b)-getProgress(a));const king=sorted[0];
+  const prog=Math.round(getProgress(king)*100);
+  const av=document.getElementById('kingAv');
+  if(king.avatar)av.innerHTML=`<img src="${king.avatar}" alt="k" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;else av.innerHTML='🏆';
+  av.style.border=`4px solid ${king.color||'var(--gold)'}`;
+  document.getElementById('kingName').textContent=king.name;
+  document.getElementById('kingScore').textContent=`加權 ${getMonthTotal(king).toFixed(1)} ／ 目標 ${getAdjTarget(king).toFixed(0)}（${prog}%）`;
+  document.getElementById('kingBadges').innerHTML=(king.medals||[]).slice(-5).map(m=>`<span style="font-size:1.4em">${m==='gold'?'🥇':m==='silver'?'🥈':'🥉'}</span>`).join('');
+  drawKingBg(king);
+  const sb=document.getElementById('starBg');sb.innerHTML='';
+  for(let i=0;i<14;i++){const s=document.createElement('div');const x=Math.random()*100,y=Math.random()*100,sz=.7+Math.random()*1.2,dl=Math.random()*3,dr=2+Math.random()*2;s.style.cssText=`position:absolute;left:${x}%;top:${y}%;font-size:${sz}em;animation:float ${dr}s ${dl}s ease-in-out infinite;opacity:${.3+Math.random()*.5}`;s.textContent=['🌟','✨','💫','⭐'][i%4];sb.appendChild(s);}
+}
+function hexR(hex,a){if(hex&&hex.startsWith('#')){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`rgba(${r},${g},${b},${a})`;}return`rgba(200,150,255,${a})`;}
+function drawKingBg(king){
+  const canvas=document.getElementById('kingBgCanvas');if(!canvas)return;
+  const banner=document.getElementById('kingBanner');
+  const W=banner.clientWidth||600,H=banner.clientHeight||300;
+  canvas.width=W;canvas.height=H;const ctx=canvas.getContext('2d');const color=king.color||'#ffd700';
+  function paint(){
+    ctx.clearRect(0,0,W,H);
+    if(king.avatar&&_kingImg&&_kingImg.complete&&_kingImg.naturalWidth>0){
+      ctx.save();ctx.filter='blur(40px) saturate(2) brightness(.8)';ctx.globalAlpha=.45;const sc=Math.max(W/_kingImg.width,H/_kingImg.height)*1.6;ctx.drawImage(_kingImg,(W-_kingImg.width*sc)/2,(H-_kingImg.height*sc)/2,_kingImg.width*sc,_kingImg.height*sc);ctx.filter='none';ctx.globalAlpha=1;ctx.restore();
+    }
+    const ov=ctx.createLinearGradient(0,0,0,H);ov.addColorStop(0,'rgba(6,3,24,.72)');ov.addColorStop(.45,'rgba(6,3,24,.52)');ov.addColorStop(1,'rgba(6,3,24,.78)');ctx.fillStyle=ov;ctx.fillRect(0,0,W,H);
+    const bl=ctx.createRadialGradient(W*.15,H*.9,0,W*.15,H*.9,W*.55);bl.addColorStop(0,hexR(color,.18));bl.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=bl;ctx.fillRect(0,0,W,H);
+    if(king.avatar&&_kingImg&&_kingImg.complete){
+      [{xr:.06,yr:.22,sz:44,a:.28,bl:6},{xr:.94,yr:.22,sz:40,a:.24,bl:8},{xr:.12,yr:.68,sz:34,a:.2,bl:10},{xr:.88,yr:.68,sz:36,a:.22,bl:8},{xr:.03,yr:.5,sz:24,a:.14,bl:14},{xr:.97,yr:.5,sz:26,a:.15,bl:13}].forEach(p=>{const x=p.xr*W,y=p.yr*H;ctx.save();ctx.beginPath();ctx.arc(x,y,p.sz,0,Math.PI*2);ctx.clip();ctx.filter=`blur(${p.bl}px)`;ctx.globalAlpha=p.a;ctx.drawImage(_kingImg,x-p.sz,y-p.sz,p.sz*2,p.sz*2);ctx.filter='none';ctx.globalAlpha=1;ctx.restore();const rg=ctx.createRadialGradient(x,y,p.sz*.7,x,y,p.sz+8);rg.addColorStop(0,hexR(color,.6));rg.addColorStop(1,'rgba(0,0,0,0)');ctx.save();ctx.globalAlpha=p.a*.9;ctx.beginPath();ctx.arc(x,y,p.sz+8,0,Math.PI*2);ctx.fillStyle=rg;ctx.fill();ctx.restore();});
+    }
+    [[.07,.12,'s4',10],[.93,.1,'s4',9],[.18,.88,'s6',9],[.82,.86,'s6',8],[.5,.04,'s4',12],[.03,.45,'d',8],[.97,.45,'d',8]].forEach(([xr,yr,t,sz])=>{const x=xr*W,y=yr*H;ctx.save();ctx.strokeStyle=color;ctx.fillStyle=color;ctx.globalAlpha=.6;ctx.shadowBlur=12;ctx.shadowColor=color;if(t==='s4'){ctx.lineWidth=1.8;for(let i=0;i<4;i++){const a=i*Math.PI/2-Math.PI/4;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*sz,y+Math.sin(a)*sz);ctx.stroke();}ctx.beginPath();ctx.arc(x,y,sz*.25,0,Math.PI*2);ctx.fill();}else if(t==='s6'){ctx.lineWidth=1.5;for(let i=0;i<6;i++){const a=i*Math.PI/3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*sz,y+Math.sin(a)*sz);ctx.stroke();}ctx.beginPath();ctx.arc(x,y,sz*.22,0,Math.PI*2);ctx.fill();}else{ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x,y-sz);ctx.lineTo(x+sz*.6,y);ctx.lineTo(x,y+sz);ctx.lineTo(x-sz*.6,y);ctx.closePath();ctx.stroke();}ctx.restore();});
+    const ll=ctx.createRadialGradient(W/2,-10,0,W/2,-10,W*.4);ll.addColorStop(0,hexR(color,.22));ll.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=ll;ctx.fillRect(0,0,W,H);
+  }
+  if(king.avatar){if(!_kingImg||_kingImg._src!==king.avatar){_kingImg=new Image();_kingImg._src=king.avatar;_kingImg.onload=paint;_kingImg.src=king.avatar;}else paint();}else paint();
+}
+
+// ════════════════════════════════════════════
+// TITLES ROW
+// ════════════════════════════════════════════
+function renderTitlesRow(){
+  const tr=document.getElementById('titlesRow');if(!tr)return;tr.innerHTML='';
+  const pl=Object.values(players).filter(p=>p.empId);if(!pl.length)return;
+  let jaBest={p:null,v:0},hyBest={p:null,v:0},thrBest={p:null,v:0};
+  pl.forEach(p=>{const l=(p.logs&&p.logs[YM])||{};let ja=0,hy=0;Object.values(l).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;});const thr=(p.throwReceived&&p.throwReceived[YM])||0;if(ja>jaBest.v)jaBest={p,v:ja};if(hy>hyBest.v)hyBest={p,v:hy};if(thr>thrBest.v)thrBest={p,v:thr};});
+  const warriors=getPentagonWarriors();
+  [{icon:'⚡',label:'結案王',best:jaBest,unit:'件',grad:'linear-gradient(135deg,#f7971e,#ffd200)',glow:'rgba(247,151,30,.35)'},{icon:'🌊',label:'緩議王',best:hyBest,unit:'件',grad:'linear-gradient(135deg,#0072ff,#00c6ff)',glow:'rgba(0,180,255,.35)'},{icon:'💖',label:'人氣王',best:thrBest,unit:'票',grad:'linear-gradient(135deg,#e91e63,#ff6090)',glow:'rgba(233,30,99,.35)'}].forEach(({icon,label,best,unit,grad,glow})=>{
+    const card=document.createElement('div');card.style.cssText=`flex:1;min-width:clamp(80px,15vw,120px);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:clamp(10px,1.5vw,14px) clamp(8px,1.2vw,12px);text-align:center;position:relative;overflow:hidden;transition:transform .2s;box-shadow:0 0 20px ${glow}`;
+    const gd=document.createElement('div');gd.style.cssText=`position:absolute;top:0;left:0;right:0;height:3px;background:${grad};border-radius:16px 16px 0 0`;card.appendChild(gd);
+    if(best.p){
+      const avW=makeAvEl(best.p.avatar,Math.min(52,Math.round(window.innerWidth*.08)));avW.style.cssText+=`;margin:4px auto 8px;border:3px solid transparent;box-shadow:0 0 12px ${glow}`;
+      const lbl=document.createElement('div');lbl.style.cssText='font-size:.7em;color:var(--mut);margin-bottom:2px';lbl.innerHTML=`${icon} ${label}`;
+      const nm=document.createElement('div');nm.style.cssText='font-weight:700;font-size:clamp(.78em,1.5vw,.88em);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';nm.textContent=best.p.name;
+      const vl=document.createElement('div');vl.style.cssText=`font-size:clamp(.68em,1.3vw,.75em);background:${grad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700`;vl.textContent=`${best.v} ${unit}`;
+      card.appendChild(lbl);card.appendChild(avW);card.appendChild(nm);card.appendChild(vl);
+    }else card.innerHTML+=`<div style="font-size:1.6em;margin:6px 0">${icon}</div><div style="font-size:.8em;font-weight:700;margin-bottom:4px">${label}</div><div style="font-size:.72em;color:var(--mut)">暫無</div>`;
+    tr.appendChild(card);
   });
-  return[maxJa,maxHy,maxSb,maxTx,maxThr];
+  if(warriors.length>0){
+    const wCard=document.createElement('div');wCard.style.cssText='flex:1;min-width:clamp(80px,15vw,120px);border-radius:16px;padding:clamp(10px,1.5vw,14px) clamp(8px,1.2vw,12px);text-align:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#0a0520,#1a0540);box-shadow:0 0 30px rgba(255,215,0,.25)';
+    const rb=document.createElement('div');rb.style.cssText='position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ffd700,#e040fb,#00bcd4,#ffd700);animation:borderFlow 2s linear infinite;border-radius:16px 16px 0 0';wCard.appendChild(rb);
+    const star=document.createElement('div');star.style.cssText='font-size:1.6em;margin:4px 0 4px;animation:float 2s ease-in-out infinite;filter:drop-shadow(0 0 8px #ffd700)';star.textContent='⭐';wCard.appendChild(star);
+    const lbl=document.createElement('div');lbl.style.cssText='font-size:.7em;color:#ffd700;margin-bottom:6px;font-weight:700';lbl.textContent='五邊形戰士';wCard.appendChild(lbl);
+    warriors.forEach(w=>{const avW=makeAvEl(w.avatar,Math.min(44,Math.round(window.innerWidth*.07)));avW.style.cssText+=`;margin:2px auto 4px;border:2px solid #ffd700;box-shadow:0 0 10px rgba(255,215,0,.5)`;const nm=document.createElement('div');nm.style.cssText='font-size:clamp(.72em,1.4vw,.78em);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';nm.textContent=w.name;wCard.appendChild(avW);wCard.appendChild(nm);});
+    tr.appendChild(wCard);
+  }
 }
 
-function renderStats(){
-  const players=Object.values(state.players);
-  const sg=document.getElementById('sgrid');sg.innerHTML='';
-  const maxVals=getAllMax();
-  players.forEach(p=>{
-    const logs=(p.logs&&p.logs[YM])||{};
-    let ja=0,hy=0,sb=0,tx=0;
-    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
-    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
-    const prog=Math.round(getProgress(p)*100);
+// ════════════════════════════════════════════
+// PLAYERS GRID
+// ════════════════════════════════════════════
+function renderPlayersGrid(){
+  const pl=Object.values(players).filter(p=>p.empId).sort((a,b)=>getProgress(b)-getProgress(a));
+  const grid=document.getElementById('playersGrid');grid.innerHTML='';
+  pl.forEach(p=>{
+    const prog=Math.round(getProgress(p)*100);const total=getMonthTotal(p).toFixed(1);const adjT=getAdjTarget(p).toFixed(0);
     const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
+    const isWarrior=getPentagonWarriors().some(w=>w.empId===p.empId);
+    const charmCount=(p.throwReceived&&p.throwReceived[YM])||0;
+    const card=document.createElement('div');card.style.cssText='background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:clamp(12px,2vw,16px);padding:clamp(12px,1.8vw,16px);text-align:center;transition:all .25s';
+    const sz=Math.min(64,Math.max(50,Math.round(window.innerWidth*.09)));
+    const av=makeAvEl(p.avatar,sz);av.style.cssText+=`;margin:0 auto 10px;border:3px solid ${p.color||'#f7971e'}`;card.appendChild(av);
+    const inner=document.createElement('div');
+    inner.innerHTML=`<div style="font-weight:700;font-size:clamp(.85em,1.6vw,.95em);margin-bottom:2px">${p.name} ${medals}${isWarrior?' ⭐':''}</div>
+      <div style="font-size:clamp(.68em,1.3vw,.75em);color:var(--mut)">${p.empId} ｜ 目標 ${p.target}/日</div>
+      <div style="height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin:7px 0 3px"><div style="width:${prog}%;height:100%;background:${p.color||'#f7971e'};border-radius:3px"></div></div>
+      <div style="font-size:clamp(.7em,1.3vw,.77em);color:var(--mut)">進度 <b style="color:${p.color||'var(--gold)'}">${prog}%</b> ｜ ${total}/${adjT}</div>
+      <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:4px">
+        <span style="font-size:.75em;color:#e91e63">💖 ${charmCount}</span>
+        <button onclick="doCharm('${p.empId}',event)" style="background:linear-gradient(135deg,#e91e63,#c2185b);border:none;border-radius:14px;color:#fff;font-size:clamp(.68em,1.3vw,.75em);font-weight:700;padding:4px 10px;cursor:pointer;touch-action:manipulation;min-height:30px">投票 💖</button>
+      </div>`;
+    card.appendChild(inner);grid.appendChild(card);
+  });
+  const cl=document.getElementById('charmLeftDisplay');if(cl&&me)cl.textContent=`💖 今日剩餘 ${getCharmLeft()} 票`;
+}
+
+// ════════════════════════════════════════════
+// CHARM BOARD
+// ════════════════════════════════════════════
+function renderCharmBoard(){
+  const el=document.getElementById('charmBoard');if(!el)return;el.innerHTML='';
+  const pl=Object.values(players).filter(p=>p.empId).map(p=>({p,v:(p.throwReceived&&p.throwReceived[YM])||0})).sort((a,b)=>b.v-a.v).filter(x=>x.v>0);
+  if(!pl.length){el.innerHTML='<div style="color:var(--mut);font-size:.85em">尚無魅力票記錄</div>';return}
+  pl.forEach(({p,v},i)=>{const item=document.createElement('div');item.style.cssText='display:flex;align-items:center;gap:8px;background:rgba(233,30,99,.08);border:1px solid rgba(233,30,99,.2);border-radius:12px;padding:8px 14px';const rank=i===0?'🥇 ':i===1?'🥈 ':i===2?'🥉 ':`${i+1}. `;const av=makeAvEl(p.avatar,30);av.style.border=`2px solid ${p.color||'#e91e63'}`;item.appendChild(av);const txt=document.createElement('span');txt.style.fontSize='.85em';txt.innerHTML=`${rank}<b>${p.name}</b> <span style="color:#e91e63">💖 ${v}</span>`;item.appendChild(txt);el.appendChild(item);});
+}
+
+// ════════════════════════════════════════════
+// STATS + PENTA
+// ════════════════════════════════════════════
+function renderStats(){
+  const pl=Object.values(players).filter(p=>p.empId);const sg=document.getElementById('sgrid');sg.innerHTML='';const maxVals=getAllMax();
+  pl.forEach(p=>{
+    const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0,sb=0,tx=0;Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
+    const thr=(p.throwReceived&&p.throwReceived[YM])||0;const prog=Math.round(getProgress(p)*100);const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
     const card=document.createElement('div');card.className='scard';card.onclick=()=>openPenta(p.empId);
-    const header=document.createElement('div');header.className='scard-header';
+    const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;gap:11px;margin-bottom:12px';
     const av=makeAvEl(p.avatar,46);av.style.border=`2px solid ${p.color||'#f7971e'}`;
-    header.appendChild(av);
-    const info=document.createElement('div');
-    info.innerHTML=`<div style="font-weight:700;font-size:.92em">${p.name} ${medals}</div>
-      <div style="font-size:.72em;color:var(--mut)">${p.empId} ｜ 目標${p.target}/日</div>
-      <div class="progbar"><div class="progfill" style="width:${prog}%;background:${p.color||'#f7971e'}"></div></div>
-      <div style="font-size:.7em;color:var(--mut)">進度 ${prog}%</div>`;
-    header.appendChild(info);card.appendChild(header);
-    const bars=[['結案',ja,'#f7971e',maxVals[0]],['緩議',hy,'#3498db',maxVals[1]],['授變',sb,'#9b59b6',maxVals[2]],['塗銷',tx,'#2ecc71',maxVals[3]],['魅力票',thr,'#e91e63',maxVals[4]]];
-    bars.forEach(([l,v,c,mx])=>{
-      const row=document.createElement('div');row.className='brow';
-      row.innerHTML=`<div class="bl">${l}</div><div class="bbar"><div style="width:${Math.round(v/mx*100)}%;height:100%;background:${c};border-radius:3px"></div></div><div class="bval">${v}</div>`;
-      card.appendChild(row);
-    });
+    const info=document.createElement('div');info.innerHTML=`<div style="font-weight:700;font-size:.92em">${p.name} ${medals}</div><div style="font-size:.72em;color:var(--mut)">${p.empId} ｜ 目標${p.target}/日</div><div style="height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin:5px 0 3px"><div style="width:${prog}%;height:100%;background:${p.color||'#f7971e'};border-radius:3px"></div></div><div style="font-size:.7em;color:var(--mut)">進度 ${prog}%</div>`;
+    hdr.appendChild(av);hdr.appendChild(info);card.appendChild(hdr);
+    [['結案',ja,'#f7971e',maxVals[0]],['緩議',hy,'#3498db',maxVals[1]],['授變',sb,'#9b59b6',maxVals[2]],['塗銷',tx,'#2ecc71',maxVals[3]],['魅力票',thr,'#e91e63',maxVals[4]]].forEach(([l,v,c,mx])=>{const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:7px;margin-bottom:5px';row.innerHTML=`<div style="width:36px;font-size:.7em;color:var(--mut);text-align:right;flex-shrink:0">${l}</div><div style="flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden"><div style="width:${Math.round(v/mx*100)}%;height:100%;background:${c};border-radius:3px"></div></div><div style="width:30px;font-size:.7em;color:var(--ora);text-align:right;flex-shrink:0">${v}</div>`;card.appendChild(row);});
     sg.appendChild(card);
   });
 }
-
 function openPenta(empId){
-  const p=state.players[empId];
-  const logs=(p.logs&&p.logs[YM])||{};
-  let ja=0,hy=0,sb=0,tx=0;
-  Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
-  const thr=(p.throwReceived&&p.throwReceived[YM])||0;
-  const vals=[ja,hy,sb,tx,thr];
-  const maxVals=getAllMax();
-
-  // Avatar in modal
-  const pmAv=document.getElementById('pm-av');
-  if(p.avatar){pmAv.innerHTML=`<img src="${p.avatar}" alt="av">`;}
-  else{pmAv.textContent='👤';}
+  const p=players[empId];if(!p)return;
+  const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0,sb=0,tx=0;Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
+  const thr=(p.throwReceived&&p.throwReceived[YM])||0;const vals=[ja,hy,sb,tx,thr];const maxVals=getAllMax();
+  const pmAv=document.getElementById('pm-av');if(p.avatar)pmAv.innerHTML=`<img src="${p.avatar}" alt="av">`;else pmAv.textContent='👤';
   pmAv.style.border=`3px solid ${p.color||'var(--gold)'}`;
-
   document.getElementById('pmtitle').textContent=p.name+' 能力五邊形';
   document.getElementById('pm').classList.add('on');
-
   const cv=document.getElementById('pmc');const ctx=cv.getContext('2d');
-  const W=200,H=200,cx=100,cy=108,r=66;
-  ctx.clearRect(0,0,W,H);
-  const lbls=['結案','緩議','授變','塗銷','魅力值'];
-  const cols=['#f7971e','#3498db','#9b59b6','#2ecc71','#e74c3c'];
-
-  // Grid
-  for(let lv=1;lv<=5;lv++){
-    ctx.beginPath();
-    for(let i=0;i<5;i++){const a=(Math.PI*2/5)*i-Math.PI/2;const x=cx+r*(lv/5)*Math.cos(a),y=cy+r*(lv/5)*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
-    ctx.closePath();ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=.5;ctx.stroke();
-  }
-  for(let i=0;i<5;i++){const a=(Math.PI*2/5)*i-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=.5;ctx.stroke();}
-
-  // Data (normalised against all-players max)
-  ctx.beginPath();
-  vals.forEach((v,i)=>{
-    const norm=v/maxVals[i];
-    const a=(Math.PI*2/5)*i-Math.PI/2;
-    const x=cx+r*norm*Math.cos(a),y=cy+r*norm*Math.sin(a);
-    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  });
-  ctx.closePath();ctx.fillStyle=(p.color||'#f7971e')+'33';ctx.fill();ctx.strokeStyle=p.color||'#f7971e';ctx.lineWidth=2;ctx.stroke();
-
-  // Dots + labels
-  vals.forEach((v,i)=>{
-    const norm=v/maxVals[i];const a=(Math.PI*2/5)*i-Math.PI/2;
-    const dvx=cx+r*norm*Math.cos(a),dvy=cy+r*norm*Math.sin(a);
-    ctx.beginPath();ctx.arc(dvx,dvy,4,0,Math.PI*2);ctx.fillStyle=cols[i];ctx.fill();
-    const lx=cx+(r+18)*Math.cos(a),ly=cy+(r+18)*Math.sin(a);
-    ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(lbls[i],lx,ly);
-  });
-
+  const sz=Math.min(200,Math.round(window.innerWidth*.5));cv.width=sz;cv.height=sz;
+  const cx2=sz/2,cy2=sz*.5,r=sz*.32;ctx.clearRect(0,0,sz,sz);
+  const lbls=['結案','緩議','授變','塗銷','魅力值'],cols=['#f7971e','#3498db','#9b59b6','#2ecc71','#e91e63'];
+  for(let lv=1;lv<=5;lv++){ctx.beginPath();for(let i=0;i<5;i++){const a=(Math.PI*2/5)*i-Math.PI/2;i===0?ctx.moveTo(cx2+r*(lv/5)*Math.cos(a),cy2+r*(lv/5)*Math.sin(a)):ctx.lineTo(cx2+r*(lv/5)*Math.cos(a),cy2+r*(lv/5)*Math.sin(a));}ctx.closePath();ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=.5;ctx.stroke();}
+  for(let i=0;i<5;i++){const a=(Math.PI*2/5)*i-Math.PI/2;ctx.beginPath();ctx.moveTo(cx2,cy2);ctx.lineTo(cx2+r*Math.cos(a),cy2+r*Math.sin(a));ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=.5;ctx.stroke();}
+  ctx.beginPath();vals.forEach((v,i)=>{const norm=v/maxVals[i];const a=(Math.PI*2/5)*i-Math.PI/2;const x=cx2+r*norm*Math.cos(a),y=cy2+r*norm*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.closePath();ctx.fillStyle=(p.color||'#f7971e')+'33';ctx.fill();ctx.strokeStyle=p.color||'#f7971e';ctx.lineWidth=2;ctx.stroke();
+  vals.forEach((v,i)=>{const norm=v/maxVals[i];const a=(Math.PI*2/5)*i-Math.PI/2;ctx.beginPath();ctx.arc(cx2+r*norm*Math.cos(a),cy2+r*norm*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle=cols[i];ctx.fill();const lx=cx2+(r+sz*.09)*Math.cos(a),ly=cy2+(r+sz*.09)*Math.sin(a);ctx.fillStyle='#fff';ctx.font=`bold ${sz*.052}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lbls[i],lx,ly);});
   document.getElementById('pmlabels').innerHTML=lbls.map((l,i)=>`<span style="color:${cols[i]}">${l}:<b>${vals[i]}</b></span>`).join('');
 }
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 // LEADERBOARD
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 function renderLB(){
-  const players=Object.values(state.players).sort((a,b)=>getProgress(b)-getProgress(a));
+  const pl=Object.values(players).filter(p=>p.empId).sort((a,b)=>getProgress(b)-getProgress(a));
   const lbw=document.getElementById('lbw');lbw.innerHTML='';
-  players.forEach((p,i)=>{
-    const row=document.createElement('div');row.className='lbr';
-    const rank=document.createElement('div');rank.className='lbrank';
-    if(i<3)rank.style.background='rgba(255,215,0,.15)';
-    rank.textContent=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
-    const av=makeAvEl(p.avatar,38);av.className='lb-av';av.style.border=`2px solid ${p.color||'#f7971e'}`;
-    const info=document.createElement('div');info.style.flex='1';
+  pl.forEach((p,i)=>{
+    const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:clamp(8px,1.5vw,11px);padding:clamp(9px,1.5vw,11px) clamp(10px,1.8vw,14px);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:7px';
+    const rank=document.createElement('div');rank.style.cssText='width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8em;background:rgba(255,255,255,.08);flex-shrink:0';if(i<3)rank.style.background='rgba(255,215,0,.15)';rank.textContent=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+    const av=makeAvEl(p.avatar,38);av.style.border=`2px solid ${p.color||'#f7971e'}`;
     const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
-    const prog=Math.round(getProgress(p)*100);
-    info.innerHTML=`<div style="font-weight:700;font-size:.9em">${p.name} ${medals}</div>
-      <div style="font-size:.7em;color:var(--mut)">${p.empId} ｜ 目標 ${p.target}/日</div>`;
-    const score=document.createElement('div');score.style.textAlign='right';
-    score.innerHTML=`<div style="color:var(--gold);font-weight:700">${getMonthTotal(p).toFixed(1)}</div>
-      <div style="font-size:.73em;color:var(--mut)">${prog}%</div>`;
-    row.appendChild(rank);row.appendChild(av);row.appendChild(info);row.appendChild(score);
-    lbw.appendChild(row);
+    const info=document.createElement('div');info.style.flex='1';info.innerHTML=`<div style="font-weight:700;font-size:.9em">${p.name} ${medals}</div><div style="font-size:.7em;color:var(--mut)">${p.empId} ｜ 目標 ${p.target}/日</div>`;
+    const score=document.createElement('div');score.style.textAlign='right';score.innerHTML=`<div style="color:var(--gold);font-weight:700">${getMonthTotal(p).toFixed(1)}</div><div style="font-size:.73em;color:var(--mut)">${Math.round(getProgress(p)*100)}%</div>`;
+    row.appendChild(rank);row.appendChild(av);row.appendChild(info);row.appendChild(score);lbw.appendChild(row);
   });
 }
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 // TITLES
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 function getPentagonWarriors(){
-  // A player is a pentagon warrior if their values for ALL 5 axes
-  // reach 100% of the global max (i.e., they are tied-for or #1 in all 5)
-  const players=Object.values(state.players);
-  const maxVals=getAllMax(); // [maxJa,maxHy,maxSb,maxTx,maxThr]
-  return players.filter(p=>{
-    const logs=(p.logs&&p.logs[YM])||{};
-    let ja=0,hy=0,sb=0,tx=0;
-    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});
-    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
-    const vals=[ja,hy,sb,tx,thr];
-    // Must be >= 90% of the max in each dimension (allows tied top)
-    return vals.every((v,i)=>maxVals[i]>0&&v/maxVals[i]>=0.999);
-  });
+  const pl=Object.values(players).filter(p=>p.empId);const maxVals=getAllMax();
+  return pl.filter(p=>{const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0,sb=0,tx=0;Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0});const thr=(p.throwReceived&&p.throwReceived[YM])||0;return[ja,hy,sb,tx,thr].every((v,i)=>maxVals[i]>0&&v/maxVals[i]>=0.999);});
 }
-
 function renderTitles(){
-  const players=Object.values(state.players);
-  let jaBest={p:null,v:0},hyBest={p:null,v:0},throwBest={p:null,v:0};
-  players.forEach(p=>{
-    const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0;
-    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0});
-    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
-    if(ja>jaBest.v)jaBest={p,v:ja};
-    if(hy>hyBest.v)hyBest={p,v:hy};
-    if(thr>throwBest.v)throwBest={p,v:thr};
-  });
-  const tg=document.getElementById('tgrid');tg.innerHTML='';
-  // Pentagon warriors
-  const warriors=getPentagonWarriors();
-  if(warriors.length>0){
-    const wCard=document.createElement('div');
-    wCard.className='tcard';
-    wCard.style.cssText='background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(130,60,255,.12));border:2px solid rgba(255,215,0,.4);position:relative;overflow:hidden';
-    wCard.innerHTML=`<div style="position:absolute;inset:0;background:conic-gradient(from 0deg,rgba(255,215,0,.05),rgba(130,60,255,.05),rgba(0,200,255,.05),rgba(255,215,0,.05));animation:auroraRot 8s linear infinite;pointer-events:none"></div>
-      <div style="font-size:2em;margin-bottom:7px;position:relative">⭐</div>
-      <div style="color:var(--gold);font-weight:900;font-size:.95em;margin-bottom:3px;position:relative;background:linear-gradient(135deg,#ffd700,#fff,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">五邊形戰士</div>
-      <div style="font-size:.72em;color:var(--mut);margin-bottom:10px;position:relative">五項全滿！</div>`;
-    warriors.forEach(w=>{
-      const av=makeAvEl(w.avatar,52);av.style.cssText+=`;margin:6px auto;border:3px solid var(--gold);box-shadow:0 0 14px rgba(255,215,0,.5)`;
-      wCard.appendChild(av);
-      const nm=document.createElement('div');nm.style.cssText='font-weight:700;font-size:.88em;position:relative';nm.textContent=w.name;wCard.appendChild(nm);
-    });
-    tg.appendChild(wCard);
+  const pl=Object.values(players).filter(p=>p.empId);let jaBest={p:null,v:0},hyBest={p:null,v:0},throwBest={p:null,v:0};
+  pl.forEach(p=>{const l=(p.logs&&p.logs[YM])||{};let ja=0,hy=0;Object.values(l).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0});const thr=(p.throwReceived&&p.throwReceived[YM])||0;if(ja>jaBest.v)jaBest={p,v:ja};if(hy>hyBest.v)hyBest={p,v:hy};if(thr>throwBest.v)throwBest={p,v:thr};});
+  const tg=document.getElementById('tgrid');tg.innerHTML='';const warriors=getPentagonWarriors();
+  if(warriors.length>0){const wCard=document.createElement('div');wCard.className='tcard';wCard.style.cssText='background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(130,60,255,.12));border:2px solid rgba(255,215,0,.4);position:relative;overflow:hidden';wCard.innerHTML=`<div style="position:absolute;inset:0;background:conic-gradient(from 0deg,rgba(255,215,0,.05),rgba(130,60,255,.05),rgba(0,200,255,.05),rgba(255,215,0,.05));animation:auroraRot 8s linear infinite;pointer-events:none"></div><div style="font-size:2em;margin-bottom:7px;position:relative">⭐</div><div style="color:var(--gold);font-weight:900;font-size:.95em;margin-bottom:3px;position:relative;background:linear-gradient(135deg,#ffd700,#fff,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">五邊形戰士</div><div style="font-size:.72em;color:var(--mut);margin-bottom:10px;position:relative">五項全滿！</div>`;warriors.forEach(w=>{const av=makeAvEl(w.avatar,52);av.style.cssText+=`;margin:6px auto;border:3px solid var(--gold);box-shadow:0 0 14px rgba(255,215,0,.5)`;wCard.appendChild(av);const nm=document.createElement('div');nm.style.cssText='font-weight:700;font-size:.88em;position:relative';nm.textContent=w.name;wCard.appendChild(nm);});tg.appendChild(wCard);}
+  [['⚡','結案王','每月結案最多',jaBest,'件'],['🌊','緩議王','每月緩議最多',hyBest,'件'],['💖','人氣王','獲得魅力票最多',throwBest,'票']].forEach(([icon,name,desc,best,unit])=>{const card=document.createElement('div');card.className='tcard';card.innerHTML=`<div style="font-size:2em;margin-bottom:7px">${icon}</div><div style="color:var(--ora);font-weight:700;font-size:.87em;margin-bottom:3px">${name}</div><div style="font-size:.72em;color:var(--mut);margin-bottom:10px">${desc}</div>`;if(best.p){const av=makeAvEl(best.p.avatar,60);av.style.cssText+=`;margin:8px auto 6px;border:3px solid var(--gold)`;card.appendChild(av);const nm=document.createElement('div');nm.style.fontWeight='700';nm.textContent=best.p.name;const vl=document.createElement('div');vl.style.cssText='font-size:.72em;color:var(--mut);margin-top:3px';vl.textContent=`${best.v} ${unit}`;card.appendChild(nm);card.appendChild(vl);}else card.innerHTML+=`<div style="color:var(--mut)">暫無</div>`;tg.appendChild(card);});
+}
+
+// ════════════════════════════════════════════
+// VOTE TAB
+// ════════════════════════════════════════════
+function renderVoteTab(){
+  const left=getCharmLeft();const lv=document.getElementById('voteCharmLeft');if(lv)lv.textContent=`今日剩餘 ${left} 票`;
+  const grid=document.getElementById('voteGrid');if(!grid)return;grid.innerHTML='';
+  const pl=Object.values(players).filter(p=>p.empId);
+  pl.forEach(p=>{const cc=(p.throwReceived&&p.throwReceived[YM])||0;const card=document.createElement('div');card.style.cssText='background:rgba(255,255,255,.04);border:1px solid rgba(233,30,99,.18);border-radius:16px;padding:clamp(12px,2vw,16px);text-align:center';const sz=Math.min(72,Math.max(50,Math.round(window.innerWidth*.1)));const av=makeAvEl(p.avatar,sz);av.style.cssText+=`;margin:0 auto 10px;border:3px solid ${p.color||'#e91e63'}`;card.appendChild(av);const info=document.createElement('div');info.innerHTML=`<div style="font-weight:700;font-size:clamp(.85em,1.6vw,.95em);margin-bottom:3px">${p.name}</div><div style="font-size:.78em;color:#e91e63;margin-bottom:10px">💖 ${cc} 票</div><button onclick="doCharm('${p.empId}',event)" style="background:${left<=0?'rgba(100,100,100,.3)':'linear-gradient(135deg,#e91e63,#c2185b)'};border:none;border-radius:16px;color:${left<=0?'#888':'#fff'};font-size:clamp(.78em,1.5vw,.85em);font-weight:700;padding:8px 20px;cursor:${left<=0?'not-allowed':'pointer'};width:100%;min-height:36px;touch-action:manipulation" ${left<=0?'disabled':''}>${p.empId===me?'投給自己 💖':'投票 💖'}</button>`;card.appendChild(info);grid.appendChild(card);});
+  const board=document.getElementById('voteBoard');if(!board)return;board.innerHTML='';const sorted=pl.map(p=>({p,v:(p.throwReceived&&p.throwReceived[YM])||0})).sort((a,b)=>b.v-a.v);if(!sorted.some(x=>x.v>0)){board.innerHTML='<div style="color:var(--mut);font-size:.85em">尚無投票記錄</div>';return}const maxV=sorted[0].v||1;sorted.forEach(({p,v},i)=>{if(v===0&&i>2)return;const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:10px;background:rgba(233,30,99,.06);border:1px solid rgba(233,30,99,.15);border-radius:12px;padding:10px 14px';const rank=i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;const av=makeAvEl(p.avatar,36);av.style.border=`2px solid ${p.color||'#e91e63'}`;const info=document.createElement('div');info.style.flex='1';info.innerHTML=`<div style="font-weight:700;font-size:.88em">${rank} ${p.name}</div><div style="height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-top:4px"><div style="width:${Math.round(v/maxV*100)}%;height:100%;background:linear-gradient(90deg,#e91e63,#ff6090);border-radius:3px"></div></div>`;const cnt=document.createElement('div');cnt.style.cssText='color:#e91e63;font-weight:700;font-size:1em;flex-shrink:0';cnt.textContent=`💖 ${v}`;row.appendChild(av);row.appendChild(info);row.appendChild(cnt);board.appendChild(row);});
+}
+
+// ════════════════════════════════════════════
+// WARRIOR CELEBRATION
+// ════════════════════════════════════════════
+let _prevWarriors=new Set();
+function checkWarriorCelebration(){const w=getPentagonWarriors();w.forEach(x=>{if(me&&x.empId===me&&!_prevWarriors.has(x.empId)){setTimeout(()=>showWarriorCelebration(),300);}_prevWarriors.add(x.empId);});}
+function showWarriorCelebration(){
+  const overlay=document.getElementById('warriorOverlay'),cv=document.getElementById('warriorCanvas');if(!overlay||!cv)return;
+  overlay.style.display='block';cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height,particles=[];
+  const colors=['#ffd700','#e040fb','#00bcd4','#ff4081','#69f0ae','#ff6d00','#fff'];
+  function burst(x,y){for(let i=0;i<80;i++){const a=Math.random()*Math.PI*2,sp=2+Math.random()*8;particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3,life:1,decay:.008+Math.random()*.015,size:2+Math.random()*5,color:colors[Math.floor(Math.random()*colors.length)],star:Math.random()<.3});}}
+  burst(W*.3,H*.3);burst(W*.7,H*.3);burst(W*.5,H*.45);
+  [400,800,1100,1500].forEach(t=>setTimeout(()=>burst(W*(.2+Math.random()*.6),H*(.2+Math.random()*.5)),t));
+  let t=0;
+  function anim(){ctx.clearRect(0,0,W,H);ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(0,0,W,H);
+    particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.vx*=.99;p.life-=p.decay;ctx.save();ctx.globalAlpha=Math.max(0,p.life);if(p.star){ctx.translate(p.x,p.y);ctx.rotate(t*.1);ctx.fillStyle=p.color;ctx.beginPath();for(let j=0;j<5;j++){const a=(j/5)*Math.PI*2-Math.PI/2,b=a+Math.PI/5;j===0?ctx.moveTo(Math.cos(a)*p.size,Math.sin(a)*p.size):ctx.lineTo(Math.cos(a)*p.size,Math.sin(a)*p.size);ctx.lineTo(Math.cos(b)*p.size*.4,Math.sin(b)*p.size*.4);}ctx.closePath();ctx.shadowBlur=10;ctx.shadowColor=p.color;ctx.fill();}else{ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle=p.color;ctx.shadowBlur=8;ctx.shadowColor=p.color;ctx.fill();}ctx.restore();});
+    for(let i=particles.length-1;i>=0;i--)if(particles[i].life<=0)particles.splice(i,1);
+    t++;if(t<260||particles.length>0)requestAnimationFrame(anim);else overlay.style.display='none';
   }
-
-  [
-    ['⚡','結案王','每月結案最多',jaBest,'件'],
-    ['🌊','緩議王','每月緩議最多',hyBest,'件'],
-    ['💖','人氣王','獲得魅力票最多',throwBest,'票'],
-  ].forEach(([icon,name,desc,best,unit])=>{
-    const card=document.createElement('div');card.className='tcard';
-    card.innerHTML=`<div style="font-size:2em;margin-bottom:7px">${icon}</div><div style="color:var(--ora);font-weight:700;font-size:.87em;margin-bottom:3px">${name}</div><div style="font-size:.72em;color:var(--mut);margin-bottom:10px">${desc}</div>`;
-    if(best.p){
-      const av=makeAvEl(best.p.avatar,60);
-      av.className='title-av';av.style.border=`3px solid var(--gold)`;av.style.margin='8px auto 6px';
-      card.appendChild(av);
-      const nm=document.createElement('div');nm.style.fontWeight='700';nm.textContent=best.p.name;
-      const vl=document.createElement('div');vl.style.cssText='font-size:.72em;color:var(--mut);margin-top:3px';vl.textContent=`${best.v} ${unit}`;
-      card.appendChild(nm);card.appendChild(vl);
-    }else{
-      card.innerHTML+=`<div style="color:var(--mut)">暫無</div>`;
-    }
-    tg.appendChild(card);
-  });
+  anim();setTimeout(()=>overlay.style.display='none',5000);overlay.onclick=()=>overlay.style.display='none';
 }
 
-// ═══════════════════════════════════════════════
-// CHARM VOTE
-// ═══════════════════════════════════════════════
-function getCharmLeft(){
-  const k=`charm1_${me}_${TODAY}`;
-  return Math.max(0,3-parseInt(localStorage.getItem(k)||'0'));
-}
-function doCharm(targetId, evt){
-  if(evt){evt.stopPropagation();}
-  if(!me){showToast('請先登入','danger');return;}
-  // 允許投票給自己
-  const left=getCharmLeft();
-  if(left<=0){showToast('今日已用完3票！','danger');return;}
-  const tp=state.players[targetId];if(!tp)return;
-  if(!tp.throwReceived)tp.throwReceived={};
-  if(!tp.throwReceived[YM])tp.throwReceived[YM]=0;
-  tp.throwReceived[YM]++;
-  const k=`charm1_${me}_${TODAY}`;
-  localStorage.setItem(k,String(3-left+1));
-  save();
-  bcast('stone',{target:targetId});
-  playCharm(targetId);
-  showToast(`💖 已投票給 ${tp.name}！剩餘 ${left-1} 票`,'success');
-  renderPlayersGrid();
-  renderKingBanner();
-  renderCharmBoard();
-  // refresh vote tab if open
-  const activeVote=document.getElementById('p-vote');
-  if(activeVote&&activeVote.classList.contains('on'))renderVoteTab();
-}
-
-// ═══════════════════════════════════════════════
-// STONE ANIMATION (kept for multi-tab fun)
-// ═══════════════════════════════════════════════
-let stones=[];let bumpTimers={};
-function bumpPlayer(id){bumpTimers[id]=2;}
-function playCharm(targetId){
-  const cv=document.getElementById('sc');cv.style.display='block';
-  cv.width=window.innerWidth;cv.height=window.innerHeight;
-  // Find approximate position of target card
-  const cards=document.querySelectorAll('.player-card');
-  let tx=window.innerWidth/2,ty=window.innerHeight/2;
-  const players=Object.values(state.players).sort((a,b)=>getProgress(b)-getProgress(a));
-  const idx=players.findIndex(p=>p.empId===targetId);
-  if(idx>=0&&cards[idx]){const r=cards[idx].getBoundingClientRect();tx=r.left+r.width/2;ty=r.top+r.height/2;}
-  const hearts=[];
-  for(let i=0;i<6;i++)hearts.push({x:tx+(-40+Math.random()*80),y:ty,vy:-2-Math.random()*2,vx:(-1+Math.random()*2),t:0,dur:45+Math.floor(Math.random()*15),emoji:'💖'});
-  function animH(){
-    const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
-    hearts.forEach(h=>{h.t++;h.x+=h.vx;h.y+=h.vy;ctx.save();ctx.globalAlpha=1-h.t/h.dur;ctx.font=`${18+h.t*.3}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(h.emoji,h.x,h.y);ctx.restore();});
-    if(hearts.some(h=>h.t<h.dur))requestAnimationFrame(animH);
-    else{ctx.clearRect(0,0,cv.width,cv.height);cv.style.display='none';}
-  }
-  animH();
-}
-
-function playStone(fromId,toId){
-  const cv=document.getElementById('sc');cv.style.display='block';
-  cv.width=window.innerWidth;cv.height=window.innerHeight;
-  stones.push({fx:Math.random()*window.innerWidth,fy:50,tx:Math.random()*window.innerWidth,ty:window.innerHeight*.4,t:0,dur:50});
-  if(stones.length===1)animSt();
-}
-function animSt(){
-  const cv=document.getElementById('sc');const ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,cv.width,cv.height);
-  stones=stones.filter(s=>s.t<s.dur);
-  stones.forEach(s=>{s.t++;const pr=s.t/s.dur;const px=s.fx+(s.tx-s.fx)*pr;const arc=Math.sin(pr*Math.PI)*100;const py=s.fy+(s.ty-s.fy)*pr-arc;ctx.save();ctx.globalAlpha=pr<.9?1:1-(pr-.9)/.1;ctx.translate(px,py);ctx.rotate(pr*Math.PI*5);ctx.font='22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🪨',0,0);ctx.restore();});
-  if(stones.length)requestAnimationFrame(animSt);
-  else{ctx.clearRect(0,0,cv.width,cv.height);cv.style.display='none';}
-}
-
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 // TAB SWITCH
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 function switchTab(tab){
   const names=['home','daily','stats','lb','titles','vote'];
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('on',names[i]===tab));
   document.querySelectorAll('.pane').forEach(el=>el.classList.remove('on'));
   document.getElementById('p-'+tab).classList.add('on');
-  if(tab==='home'){renderKingBanner();renderPlayersGrid();renderCharmLeft();renderCharmBoard();renderTitlesRow();}
+  if(tab==='home'){renderKingBanner();renderPlayersGrid();renderCharmBoard();renderTitlesRow();}
   if(tab==='daily')renderDaily();
   if(tab==='stats')renderStats();
   if(tab==='lb')renderLB();
   if(tab==='titles')renderTitles();
   if(tab==='vote')renderVoteTab();
-  // Update topbar progress
-  if(me&&state.players[me])document.getElementById('tbprog').textContent=` ${Math.round(getProgress(state.players[me])*100)}%`;
+  updateTopbarProg();
 }
+function refreshCurrentTab(){const on=document.querySelector('.tab.on');if(!on)return;const names=['home','daily','stats','lb','titles','vote'];const idx=Array.from(document.querySelectorAll('.tab')).indexOf(on);if(idx>=0)switchTab(names[idx]);updateTopbarBadge();}
 
-function refreshCurrentTab(){
-  const on=document.querySelector('.tab.on');
-  if(!on)return;
-  const names=['home','daily','stats','lb','titles','vote'];
-  const idx=Array.from(document.querySelectorAll('.tab')).indexOf(on);
-  if(idx>=0)switchTab(names[idx]);
-}
+// ════════════════════════════════════════════
+// SPARKLE BACKGROUND
+// ════════════════════════════════════════════
+(function(){const cv=document.getElementById('sparkleCanvas');if(!cv)return;let W,H;const pts=[];function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}resize();window.addEventListener('resize',resize);for(let i=0;i<70;i++)pts.push({x:Math.random()*1600,y:Math.random()*900,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.18,r:Math.random()*1.6+.4,opacity:Math.random()*.6+.1,twinkle:Math.random()*Math.PI*2,speed:Math.random()*.04+.015,color:['rgba(255,215,0,','rgba(180,100,255,','rgba(100,180,255,','rgba(255,180,255,'][Math.floor(Math.random()*4)]});function draw(){const ctx=cv.getContext('2d');cv.width=W;cv.height=H;ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.x=(p.x+p.vx+W)%W;p.y=(p.y+p.vy+H)%H;p.twinkle+=p.speed;const alpha=p.opacity*(.5+Math.sin(p.twinkle)*.5);const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);g.addColorStop(0,p.color+(alpha*.9)+')');g.addColorStop(1,p.color+'0)');ctx.beginPath();ctx.arc(p.x,p.y,p.r*4,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.color+alpha+')';ctx.fill();});for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<100){ctx.save();ctx.globalAlpha=(1-dist/100)*.1;ctx.strokeStyle='rgba(200,150,255,1)';ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();ctx.restore();}}requestAnimationFrame(draw);}draw();})();
 
-// ═══════════════════════════════════════════════
-// MONTHLY RESET
-// ═══════════════════════════════════════════════
-function checkReset(){
-  const last=localStorage.getItem('cs1reset');
-  if(last!==YM){
-    Object.values(state.players).forEach(p=>{p.reachedGoal=null;});
-    localStorage.setItem('cs1reset',YM);save();
-  }
-}
-
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 // TOAST
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 let tT;
-function showToast(msg,type='info'){
-  const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';
-  el.style.borderColor=type==='danger'?'rgba(255,80,80,.4)':type==='success'?'rgba(68,255,136,.4)':'rgba(255,255,255,.15)';
-  clearTimeout(tT);tT=setTimeout(()=>el.style.display='none',3200);
+function showToast(msg,type='info'){const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';el.style.borderColor=type==='danger'?'rgba(255,80,80,.4)':type==='success'?'rgba(68,255,136,.4)':'rgba(255,255,255,.15)';clearTimeout(tT);tT=setTimeout(()=>el.style.display='none',3200);}
+
+// ════════════════════════════════════════════
+// RENDER EXISTING PLAYERS ON TITLE SCREEN
+// ════════════════════════════════════════════
+function renderExisting(){
+  const pl=Object.values(players).filter(p=>p.empId);const ep=document.getElementById('epanel');
+  if(!pl.length){ep.style.display='none';return}
+  ep.style.display='block';const el=document.getElementById('elist');el.innerHTML='';
+  pl.forEach(p=>{const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)';const av=makeAvEl(p.avatar,32);av.style.border=`2px solid ${p.color||'#f7971e'}`;const info=document.createElement('div');info.innerHTML=`<div style="font-weight:700;font-size:.88em">${p.name}</div><div style="font-size:.72em;color:var(--mut)">${p.empId}</div>`;row.appendChild(av);row.appendChild(info);el.appendChild(row);});
 }
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════
-load();renderExisting();
-window.addEventListener('resize',()=>{const cv=document.getElementById('sc');cv.width=window.innerWidth;cv.height=window.innerHeight;});
+// ════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  // Check if Firebase config has been filled in
+  const configOK = firebaseConfig.apiKey && firebaseConfig.apiKey !== 'AIzaSyAdr_4vgKeV3-M5fE3uMJ-MQSUTScRIefc'
+                && firebaseConfig.databaseURL && firebaseConfig.databaseURL !== 'https://case-sprint-13143-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-// ══════════════════════════════════════════════
-// PENTAGON WARRIOR CELEBRATION
-// ══════════════════════════════════════════════
-function showWarriorCelebration(){
-  const overlay=document.getElementById('warriorOverlay');
-  const cv=document.getElementById('warriorCanvas');
-  if(!overlay||!cv)return;
-  overlay.style.display='block';
-  cv.width=window.innerWidth;cv.height=window.innerHeight;
-  const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height;
-
-  // Fireworks particles
-  const particles=[];
-  const colors=['#ffd700','#e040fb','#00bcd4','#ff4081','#69f0ae','#ff6d00','#fff'];
-  function spawnBurst(x,y){
-    for(let i=0;i<80;i++){
-      const angle=Math.random()*Math.PI*2;
-      const speed=2+Math.random()*8;
-      particles.push({
-        x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed-3,
-        life:1,decay:.008+Math.random()*.015,
-        size:2+Math.random()*5,
-        color:colors[Math.floor(Math.random()*colors.length)],
-        trail:[],type:Math.random()<.3?'star':'circle'
-      });
-    }
+  if(!configOK){
+    // Show setup instructions instead of loading forever
+    document.getElementById('loadingOverlay').innerHTML=`
+      <div style="text-align:center;max-width:400px;padding:24px">
+        <div style="font-size:2.5em;margin-bottom:16px">🔥</div>
+        <div style="color:var(--gold);font-size:1.1em;font-weight:700;margin-bottom:12px">需要設定 Firebase</div>
+        <div style="color:var(--mut);font-size:.85em;line-height:1.7;margin-bottom:20px">
+          請前往 <b style="color:#fff">firebase.google.com</b> 建立免費專案，<br>
+          取得設定碼後填入 HTML 檔案中的<br>
+          <code style="background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px;color:var(--ora)">firebaseConfig</code> 區塊
+        </div>
+        <a href="https://firebase.google.com" target="_blank"
+          style="display:inline-block;padding:10px 22px;background:linear-gradient(135deg,var(--ora),var(--gold));color:#1a0a00;border-radius:20px;text-decoration:none;font-weight:700;font-size:.9em">
+          前往 Firebase 設定 →
+        </a>
+      </div>`;
+    return;
   }
 
-  // Initial bursts
-  spawnBurst(W*.3,H*.3);spawnBurst(W*.7,H*.3);
-  spawnBurst(W*.5,H*.45);spawnBurst(W*.2,H*.6);spawnBurst(W*.8,H*.6);
+  initFirebase();
 
-  // Schedule more bursts
-  const burstTimers=[400,800,1100,1500,1900].map(t=>setTimeout(()=>{
-    spawnBurst(W*(0.2+Math.random()*.6),H*(0.2+Math.random()*.5));
-  },t));
+  // Timeout: if DB doesn't respond in 8 seconds, show error
+  const loadTimeout = setTimeout(()=>{
+    document.getElementById('loadingOverlay').innerHTML=`
+      <div style="text-align:center;max-width:380px;padding:24px">
+        <div style="font-size:2.5em;margin-bottom:14px">⚠️</div>
+        <div style="color:var(--red);font-size:1em;font-weight:700;margin-bottom:10px">資料庫連線失敗</div>
+        <div style="color:var(--mut);font-size:.82em;line-height:1.7;margin-bottom:16px">
+          可能原因：<br>
+          • Firebase 設定碼有誤<br>
+          • 資料庫規則未開放<br>
+          • 網路問題
+        </div>
+        <button onclick="location.reload()" style="padding:9px 22px;background:linear-gradient(135deg,var(--ora),var(--gold));color:#1a0a00;border:none;border-radius:20px;font-weight:700;cursor:pointer;font-size:.88em">重試</button>
+      </div>`;
+  }, 8000);
 
-  let t=0;
-  // Overlapping rainbow sweep
-  function animWarrior(){
-    ctx.clearRect(0,0,W,H);
-    // Dark overlay
-    ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(0,0,W,H);
-    // Rainbow sweep
-    const sweep=ctx.createLinearGradient(0,0,W,H);
-    const phase=(t*.005)%1;
-    sweep.addColorStop(0,'rgba(0,0,0,0)');
-    sweep.addColorStop(phase,'rgba(255,215,0,.06)');
-    sweep.addColorStop(Math.min(1,phase+.1),'rgba(180,60,255,.06)');
-    sweep.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=sweep;ctx.fillRect(0,0,W,H);
-
-    particles.forEach((p,i)=>{
-      p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.vx*=.99;p.life-=p.decay;
-      if(p.type==='star'){
-        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(t*.1);
-        ctx.globalAlpha=Math.max(0,p.life);
-        const s=p.size,col=p.color;
-        ctx.fillStyle=col;
-        ctx.beginPath();
-        for(let j=0;j<5;j++){
-          const a=(j/5)*Math.PI*2-Math.PI/2;
-          const b=a+Math.PI/5;
-          j===0?ctx.moveTo(Math.cos(a)*s,Math.sin(a)*s):ctx.lineTo(Math.cos(a)*s,Math.sin(a)*s);
-          ctx.lineTo(Math.cos(b)*s*.4,Math.sin(b)*s*.4);
-        }
-        ctx.closePath();ctx.fill();
-        // glow
-        ctx.shadowBlur=10;ctx.shadowColor=col;ctx.fill();
-        ctx.restore();
-      } else {
-        ctx.save();ctx.globalAlpha=Math.max(0,p.life);
-        ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-        ctx.fillStyle=p.color;
-        ctx.shadowBlur=8;ctx.shadowColor=p.color;
-        ctx.fill();ctx.restore();
-      }
-    });
-    // Remove dead
-    for(let i=particles.length-1;i>=0;i--){if(particles[i].life<=0)particles.splice(i,1);}
-    t++;
-    if(t<260||particles.length>0)requestAnimationFrame(animWarrior);
-    else{overlay.style.display='none';}
-  }
-  animWarrior();
-
-  // Auto hide after 5s
-  setTimeout(()=>{overlay.style.display='none';burstTimers.forEach(clearTimeout);},5000);
-  overlay.onclick=()=>{overlay.style.display='none';burstTimers.forEach(clearTimeout);};
-}
-
-// Check for new pentagon warriors and celebrate
-let _prevWarriors=new Set();
-function checkWarriorCelebration(){
-  const warriors=getPentagonWarriors();
-  warriors.forEach(w=>{
-    if(me&&w.empId===me&&!_prevWarriors.has(w.empId)){
-      setTimeout(()=>showWarriorCelebration(),300);
-    }
-    _prevWarriors.add(w.empId);
+  db.ref('players').once('value', snap=>{
+    clearTimeout(loadTimeout);
+    players = snap.val() || {};
+    document.getElementById('loadingOverlay').style.display='none';
+    document.getElementById('titleScreen').style.display='block';
+    const saved = sessionStorage.getItem('me');
+    if(saved && players[saved]){ me=saved; enterGame(); }
+    else renderExisting();
+  }, err=>{
+    clearTimeout(loadTimeout);
+    document.getElementById('loadingOverlay').innerHTML=`
+      <div style="text-align:center;max-width:380px;padding:24px">
+        <div style="font-size:2.5em;margin-bottom:14px">❌</div>
+        <div style="color:var(--red);font-size:1em;font-weight:700;margin-bottom:10px">連線錯誤</div>
+        <div style="color:var(--mut);font-size:.82em;margin-bottom:6px">${err.message}</div>
+        <div style="color:var(--mut);font-size:.78em;margin-bottom:16px">請確認 Firebase 設定與資料庫規則</div>
+        <button onclick="location.reload()" style="padding:9px 22px;background:linear-gradient(135deg,var(--ora),var(--gold));color:#1a0a00;border:none;border-radius:20px;font-weight:700;cursor:pointer;font-size:.88em">重試</button>
+      </div>`;
   });
-}
-
-// ══════════════════════════════════════════════
-// SPARKLE BACKGROUND CANVAS
-// ══════════════════════════════════════════════
-(function initSparkle(){
-  const cv=document.getElementById('sparkleCanvas');
-  if(!cv)return;
-  let W,H,pts=[];
-  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
-  resize();window.addEventListener('resize',resize);
-  // Create particles
-  for(let i=0;i<90;i++){
-    pts.push({
-      x:Math.random()*1600,y:Math.random()*900,
-      vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.18,
-      r:Math.random()*1.6+.4,
-      opacity:Math.random()*.6+.1,
-      twinkle:Math.random()*Math.PI*2,
-      speed:Math.random()*.04+.015,
-      color:['rgba(255,215,0,','rgba(180,100,255,','rgba(100,180,255,','rgba(255,180,255,'][Math.floor(Math.random()*4)]
-    });
-  }
-  // Lines connecting nearby particles
-  function draw(){
-    const ctx=cv.getContext('2d');
-    cv.width=W;cv.height=H;
-    ctx.clearRect(0,0,W,H);
-    const t=Date.now()/1000;
-    pts.forEach(p=>{
-      p.x=(p.x+p.vx+W)%W;p.y=(p.y+p.vy+H)%H;
-      p.twinkle+=p.speed;
-      const alpha=p.opacity*(0.5+Math.sin(p.twinkle)*0.5);
-      // Glow
-      ctx.save();
-      const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);
-      g.addColorStop(0,p.color+(alpha*.9)+')');
-      g.addColorStop(1,p.color+'0)');
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r*4,0,Math.PI*2);
-      ctx.fillStyle=g;ctx.fill();
-      // Core dot
-      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=p.color+alpha+')';ctx.fill();
-      ctx.restore();
-    });
-    // Draw connecting lines for nearby particles
-    for(let i=0;i<pts.length;i++){
-      for(let j=i+1;j<pts.length;j++){
-        const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y;
-        const dist=Math.sqrt(dx*dx+dy*dy);
-        if(dist<100){
-          ctx.save();ctx.globalAlpha=(1-dist/100)*.12;
-          ctx.strokeStyle='rgba(200,150,255,1)';ctx.lineWidth=.6;
-          ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();
-          ctx.restore();
-        }
-      }
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
+});
 </script>
 </body>
 </html>
