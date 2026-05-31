@@ -363,6 +363,139 @@ img { max-width: 100%; height: auto; }
 .modal-bx{background:#13132a;border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:clamp(18px,3vw,26px);max-width:min(340px,95vw);width:100%}
 .prof-av{width:84px;height:84px;border-radius:50%;border:3px solid var(--ora);background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:2em;cursor:pointer;overflow:hidden;margin:0 auto 8px}
 .prof-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* ═══════════════════════════════════════════
+   FULL FLUID RESPONSIVE — works 320px to 4K
+   ═══════════════════════════════════════════ */
+
+/* Base font scales with viewport */
+html { font-size: clamp(12px, 1.5vw, 16px); }
+
+/* Global safe areas */
+body {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  overflow-x: hidden !important;
+}
+
+/* Prevent ALL horizontal overflow */
+*, *::before, *::after { max-width: 100%; }
+
+/* iOS input zoom prevention — MUST be 16px+ */
+input, select, textarea {
+  font-size: max(16px, 1rem) !important;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ── Title screen ── */
+.tglow { font-size: clamp(1.6em, 6vw, 3em) !important; padding: clamp(20px,4vw,36px) 16px 4px !important; }
+.tsub { font-size: clamp(.66em, 2vw, .82em) !important; margin-bottom: clamp(16px,3vw,26px) !important; }
+.rpanel { max-width: min(520px, 96vw) !important; padding: 0 clamp(10px,3vw,16px) 40px !important; }
+.box { padding: clamp(14px,2.5vw,22px) !important; border-radius: clamp(12px,2vw,18px) !important; margin-bottom: clamp(10px,1.5vw,14px) !important; }
+.box h3 { font-size: clamp(.8em,1.8vw,.92em) !important; }
+.fl { font-size: clamp(.68em,1.4vw,.75em) !important; }
+.fi { padding: clamp(9px,1.5vw,11px) clamp(11px,1.8vw,13px) !important; border-radius: clamp(7px,1.2vw,9px) !important; }
+
+/* Avatar preview */
+.avatar-preview { width: clamp(64px,15vw,80px) !important; height: clamp(64px,15vw,80px) !important; }
+
+/* ── Buttons ── */
+.btn { padding: clamp(9px,1.5vw,11px) clamp(16px,2.5vw,22px) !important; font-size: clamp(.8em,1.6vw,.9em) !important; min-height: 40px; }
+.bsm { padding: clamp(6px,1vw,8px) clamp(12px,1.8vw,16px) !important; font-size: clamp(.74em,1.4vw,.8em) !important; min-height: 34px; }
+
+/* ── Topbar ── */
+.topbar { padding: clamp(6px,1.2vw,9px) clamp(8px,1.5vw,14px) !important; gap: clamp(5px,1vw,8px) !important; }
+.pbadge { padding: 4px clamp(8px,1.5vw,12px) !important; font-size: clamp(.74em,1.4vw,.86em) !important; gap: clamp(5px,1vw,8px) !important; }
+.tabs { max-width: calc(100vw - 110px) !important; overflow-x: auto !important; flex-wrap: nowrap !important; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { padding: clamp(5px,.9vw,7px) clamp(7px,1.2vw,13px) !important; font-size: clamp(.66em,1.2vw,.78em) !important; flex-shrink: 0; }
+
+/* ── Main area ── */
+.main { padding: clamp(10px,2vw,20px) clamp(10px,2.5vw,16px) !important; }
+
+/* ── King banner ── */
+.king-banner { min-height: clamp(200px,38vw,360px) !important; padding: clamp(18px,3vw,36px) clamp(12px,2.5vw,24px) clamp(16px,2.5vw,28px) !important; gap: clamp(7px,1.5vw,12px) !important; border-radius: clamp(14px,2.5vw,24px) !important; margin-bottom: clamp(14px,2.5vw,28px) !important; }
+.king-avatar { width: clamp(72px,13vw,120px) !important; height: clamp(72px,13vw,120px) !important; }
+.king-name { font-size: clamp(1em,3.5vw,2em) !important; }
+.king-score { font-size: clamp(.7em,1.5vw,.95em) !important; }
+.king-crown { font-size: clamp(1.4em,3.5vw,2.4em) !important; }
+
+/* ── Titles row ── */
+#titlesRow { gap: clamp(7px,1.5vw,12px) !important; }
+#titlesRow > div { min-width: clamp(70px,16vw,120px) !important; padding: clamp(9px,1.5vw,14px) clamp(7px,1.2vw,12px) !important; border-radius: clamp(12px,1.8vw,16px) !important; }
+
+/* ── Players grid ── */
+.players-grid { grid-template-columns: repeat(auto-fill, minmax(clamp(140px,28vw,200px),1fr)) !important; gap: clamp(9px,1.5vw,14px) !important; }
+.player-card { padding: clamp(10px,1.8vw,16px) !important; border-radius: clamp(11px,1.8vw,16px) !important; }
+
+/* ── Daily input ── */
+.daily-wrap { max-width: min(560px,100%) !important; }
+.irow { gap: clamp(7px,1.5vw,11px) !important; margin-bottom: clamp(7px,1.5vw,11px) !important; }
+.ibox { padding: clamp(10px,1.8vw,13px) !important; border-radius: clamp(9px,1.5vw,12px) !important; }
+.ibox label { font-size: clamp(.66em,1.3vw,.75em) !important; margin-bottom: 6px !important; }
+.numctrl button { padding: clamp(6px,1vw,8px) clamp(9px,1.5vw,14px) !important; font-size: clamp(1.1em,2vw,1.4em) !important; min-width: 42px; min-height: 42px; }
+.leave-row { padding: clamp(9px,1.5vw,13px) !important; gap: clamp(6px,1.2vw,10px) !important; }
+.leave-input { width: clamp(95px,18vw,130px) !important; }
+.leave-input button { min-width: 36px; min-height: 36px; }
+
+/* ── Stats ── */
+.sgrid { grid-template-columns: repeat(auto-fill, minmax(clamp(190px,30vw,260px),1fr)) !important; gap: clamp(9px,1.5vw,13px) !important; }
+
+/* ── Leaderboard ── */
+.lbw { max-width: min(680px,100%) !important; }
+.lbr { padding: clamp(8px,1.5vw,11px) clamp(9px,1.8vw,14px) !important; gap: clamp(7px,1.2vw,11px) !important; border-radius: clamp(9px,1.5vw,12px) !important; margin-bottom: clamp(5px,1vw,7px) !important; }
+
+/* ── Titles ── */
+.tgrid { grid-template-columns: repeat(auto-fill, minmax(clamp(130px,22vw,175px),1fr)) !important; gap: clamp(8px,1.5vw,11px) !important; }
+.tcard { padding: clamp(13px,2vw,18px) !important; border-radius: clamp(11px,1.8vw,13px) !important; }
+
+/* ── Vote grid ── */
+#voteGrid { grid-template-columns: repeat(auto-fill, minmax(clamp(140px,28vw,200px),1fr)) !important; gap: clamp(10px,1.5vw,14px) !important; }
+
+/* ── Log table ── */
+.lt { font-size: clamp(.68em,1.3vw,.85em) !important; }
+.lt th,.lt td { padding: clamp(4px,.7vw,6px) clamp(4px,.8vw,8px) !important; }
+
+/* ── Modals ── */
+.modal-bx { padding: clamp(16px,3vw,26px) !important; max-width: min(340px,94vw) !important; border-radius: clamp(14px,2.5vw,18px) !important; }
+.pmb { padding: clamp(14px,3vw,24px) !important; max-width: min(300px,92vw) !important; }
+#pmc { width: clamp(160px,45vw,200px) !important; height: clamp(160px,45vw,200px) !important; }
+
+/* ── Touch tap highlight remove ── */
+@media (hover:none) and (pointer:coarse) {
+  button, .tab, .ci, .player-card, .scard, .lbr, .tcard, .pbadge {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .numctrl button, .leave-input button { min-width: 44px !important; min-height: 44px !important; }
+}
+
+/* ── Very small phones (≤360px) ── */
+@media (max-width: 360px) {
+  html { font-size: 11.5px; }
+  .irow { grid-template-columns: 1fr 1fr !important; }
+  .players-grid { grid-template-columns: 1fr 1fr !important; }
+  .tgrid { grid-template-columns: 1fr 1fr !important; }
+  .tab { font-size: .62em !important; padding: 5px 6px !important; }
+}
+
+/* ── Tablets (768px–1024px) ── */
+@media (min-width: 768px) and (max-width:1024px) {
+  html { font-size: 14px; }
+  .players-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+/* ── Wide screens (≥1400px) ── */
+@media (min-width: 1400px) {
+  html { font-size: 16px; }
+  .main { max-width: 1200px; margin-left: auto !important; margin-right: auto !important; }
+}
+
+/* ── 4K (≥2560px) ── */
+@media (min-width: 2560px) {
+  html { font-size: 20px; }
+  .main { max-width: 1600px; }
+}
 </style>
 </head>
 <body>
@@ -392,9 +525,11 @@ img { max-width: 100%; height: auto; }
       <h3>🆕 新增角色</h3>
       <!-- Avatar upload -->
       <div class="avatar-wrap">
-        <div class="avatar-preview" id="regAvatarPreview" onclick="document.getElementById('avatarInput').click()">📷</div>
-        <span class="avatar-label">點擊上傳頭貼（選填）</span>
-        <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(event)">
+        <label for="avatarInput" style="cursor:pointer;display:block;text-align:center">
+          <div class="avatar-preview" id="regAvatarPreview">📷</div>
+          <span class="avatar-label">點擊上傳頭貼（選填）</span>
+        </label>
+        <input type="file" id="avatarInput" accept="image/*,image/heic,image/heif" capture="user" onchange="handleAvatarUpload(event,'reg')">
       </div>
       <div class="fgroup"><label class="fl">員工編號（6碼）</label><input class="fi" id="rEmp" maxlength="6" placeholder="例：A12345" autocomplete="off"></div>
       <div class="fgroup"><label class="fl">角色名稱</label><input class="fi" id="rName" placeholder="輸入你的稱號" autocomplete="off"></div>
@@ -569,7 +704,7 @@ img { max-width: 100%; height: auto; }
   <div class="modal-bx">
     <h3 style="color:var(--ora);margin-bottom:16px;text-align:center">✏️ 編輯個人資料</h3>
     <div class="prof-av" id="profAvPreview" onclick="document.getElementById('profAvatarInput').click()">📷</div>
-    <input type="file" id="profAvatarInput" accept="image/*" style="display:none" onchange="handleProfileAvatar(event)">
+    <input type="file" id="profAvatarInput" accept="image/*,image/heic,image/heif" capture="user" style="display:none" onchange="handleProfileAvatar(event)">
     <div style="text-align:center;font-size:.74em;color:var(--mut);margin-bottom:14px">點擊更換頭貼</div>
     <div class="fgroup"><label class="fl">角色名稱</label><input class="fi" id="editNameInput" placeholder="輸入新名稱" autocomplete="off"></div>
     <div style="display:flex;gap:10px;margin-top:14px">
@@ -667,7 +802,23 @@ function makeAvEl(avData,size=38){
   return w;
 }
 function resizeImg(dataUrl,maxPx,quality,cb){
-  const img=new Image();img.onload=()=>{const sc=Math.min(1,maxPx/Math.max(img.width,img.height));const cv=document.createElement('canvas');cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL('image/jpeg',quality));};img.src=dataUrl;
+  const img=new Image();
+  img.onload=()=>{
+    try{
+      const sc=Math.min(1,maxPx/Math.max(img.width||1,img.height||1));
+      const cv=document.createElement('canvas');
+      cv.width=Math.round(img.width*sc)||maxPx;
+      cv.height=Math.round(img.height*sc)||maxPx;
+      const ctx=cv.getContext('2d');
+      ctx.drawImage(img,0,0,cv.width,cv.height);
+      cb(cv.toDataURL('image/jpeg',quality));
+    }catch(e){
+      // fallback: use original if canvas fails
+      cb(dataUrl);
+    }
+  };
+  img.onerror=()=>{ showToast('圖片載入失敗','danger'); };
+  img.src=dataUrl;
 }
 
 // ════════════════════════════════════════════
@@ -675,18 +826,32 @@ function resizeImg(dataUrl,maxPx,quality,cb){
 // ════════════════════════════════════════════
 function handleAvatarUpload(evt,mode){
   const file=evt.target.files[0];if(!file)return;
+  if(file.size>10*1024*1024){showToast('圖片太大，請選10MB以內','danger');return;}
   const reader=new FileReader();
-  reader.onload=e=>resizeImg(e.target.result,200,.72,data=>{
-    if(mode==='reg'){pendingAvatar=data;const p=document.getElementById('regAvatarPreview');p.innerHTML=`<img src="${data}" alt="av">`;}
-  });
+  reader.onload=e=>{
+    resizeImg(e.target.result,300,.75,data=>{
+      pendingAvatar=data;
+      const p=document.getElementById('regAvatarPreview');
+      if(p){p.innerHTML='';const img=document.createElement('img');img.src=data;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';p.appendChild(img);}
+      showToast('頭貼已選取 ✓','success');
+    });
+  };
+  reader.onerror=()=>showToast('讀取失敗，請換一張圖片','danger');
   reader.readAsDataURL(file);
 }
 function handleProfileAvatar(evt){
   const file=evt.target.files[0];if(!file)return;
+  if(file.size>10*1024*1024){showToast('圖片太大，請選10MB以內','danger');return;}
   const reader=new FileReader();
-  reader.onload=e=>resizeImg(e.target.result,200,.72,data=>{
-    editAvatar=data;const p=document.getElementById('profAvPreview');p.innerHTML=`<img src="${data}" alt="av">`;
-  });
+  reader.onload=e=>{
+    resizeImg(e.target.result,300,.75,data=>{
+      editAvatar=data;
+      const p=document.getElementById('profAvPreview');
+      if(p){p.innerHTML='';const img=document.createElement('img');img.src=data;img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';p.appendChild(img);}
+      showToast('頭貼已更新 ✓','success');
+    });
+  };
+  reader.onerror=()=>showToast('讀取失敗，請換一張圖片','danger');
   reader.readAsDataURL(file);
 }
 
