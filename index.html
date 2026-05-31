@@ -1113,8 +1113,8 @@ function renderExisting(){
 // ════════════════════════════════════════════
 window.addEventListener('load',()=>{
   // Check if Firebase config has been filled in
-  const configOK = firebaseConfig.apiKey && firebaseConfig.apiKey !== 'AIzaSyAdr_4vgKeV3-M5fE3uMJ-MQSUTScRIefc'
-                && firebaseConfig.databaseURL && firebaseConfig.databaseURL !== 'https://case-sprint-13143-default-rtdb.asia-southeast1.firebasedatabase.app';
+  const configOK = firebaseConfig.apiKey && firebaseConfig.apiKey !== 'FIREBASE_API_KEY'
+                && firebaseConfig.databaseURL && firebaseConfig.databaseURL !== 'FIREBASE_DATABASE_URL';
 
   if(!configOK){
     // Show setup instructions instead of loading forever
