@@ -1355,3 +1355,109 @@ function showWarriorCelebration(){
   overlay.onclick=()=>overlay.style.display='none';
 }
 
+
+// ════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════
+let tT;
+function showToast(msg,type='info'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.style.display='block';
+  el.style.borderColor=type==='danger'?'rgba(255,80,80,.4)':type==='success'?'rgba(68,255,136,.4)':'rgba(255,255,255,.15)';
+  clearTimeout(tT);tT=setTimeout(()=>el.style.display='none',3200);
+}
+
+// ════════════════════════════════════════════
+// RENDER EXISTING PLAYERS ON TITLE SCREEN
+// ════════════════════════════════════════════
+function renderExisting(){
+  const pl=Object.values(players).filter(p=>p.empId);
+  const ep=document.getElementById('epanel');
+  if(!pl.length){ep.style.display='none';return}
+  ep.style.display='block';
+  const el=document.getElementById('elist');el.innerHTML='';
+  pl.forEach(p=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)';
+    const av=makeAvEl(p.avatar,32);av.style.border=`2px solid ${p.color||'#f7971e'}`;
+    const info=document.createElement('div');
+    info.innerHTML=`<div style="font-weight:700;font-size:.88em">${p.name}</div><div style="font-size:.72em;color:var(--mut)">${p.empId}</div>`;
+    row.appendChild(av);row.appendChild(info);el.appendChild(row);
+  });
+}
+
+// ════════════════════════════════════════════
+// SPARKLE BACKGROUND
+// ════════════════════════════════════════════
+(function(){
+  const cv=document.getElementById('sparkleCanvas');if(!cv)return;
+  let W,H;const pts=[];
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<70;i++)pts.push({
+    x:Math.random()*1600,y:Math.random()*900,
+    vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.18,
+    r:Math.random()*1.6+.4,opacity:Math.random()*.6+.1,
+    twinkle:Math.random()*Math.PI*2,speed:Math.random()*.04+.015,
+    color:['rgba(255,215,0,','rgba(180,100,255,','rgba(100,180,255,','rgba(255,180,255,'][Math.floor(Math.random()*4)]
+  });
+  function draw(){
+    const ctx=cv.getContext('2d');cv.width=W;cv.height=H;ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x=(p.x+p.vx+W)%W;p.y=(p.y+p.vy+H)%H;p.twinkle+=p.speed;
+      const alpha=p.opacity*(.5+Math.sin(p.twinkle)*.5);
+      const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);
+      g.addColorStop(0,p.color+(alpha*.9)+')');g.addColorStop(1,p.color+'0)');
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r*4,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.color+alpha+')';ctx.fill();
+    });
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        ctx.save();ctx.globalAlpha=(1-dist/100)*.1;ctx.strokeStyle='rgba(200,150,255,1)';
+        ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();ctx.restore();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+window.addEventListener('load',()=>{
+  initFirebase();
+  db.ref('players').once('value',snap=>{
+    players=snap.val()||{};
+    document.getElementById('loadingOverlay').style.display='none';
+    document.getElementById('titleScreen').style.display='block';
+    const saved=sessionStorage.getItem('me');
+    if(saved&&players[saved]){me=saved;enterGame();}
+    else renderExisting();
+  },err=>{
+    document.getElementById('loadingOverlay').innerHTML=`
+      <div style="text-align:center;max-width:380px;padding:24px">
+        <div style="font-size:2.5em;margin-bottom:14px">❌</div>
+        <div style="color:var(--red);font-size:1em;font-weight:700;margin-bottom:10px">連線錯誤</div>
+        <div style="color:var(--mut);font-size:.82em;margin-bottom:16px">${err.message}</div>
+        <button onclick="location.reload()" style="padding:9px 22px;background:linear-gradient(135deg,var(--ora),var(--gold));color:#1a0a00;border:none;border-radius:20px;font-weight:700;cursor:pointer">重試</button>
+      </div>`;
+  });
+  // Timeout 10s
+  setTimeout(()=>{
+    const ov=document.getElementById('loadingOverlay');
+    if(ov&&ov.style.display!=='none'){
+      ov.innerHTML=`
+        <div style="text-align:center;max-width:380px;padding:24px">
+          <div style="font-size:2.5em;margin-bottom:14px">⚠️</div>
+          <div style="color:var(--red);font-size:1em;font-weight:700;margin-bottom:10px">資料庫連線逾時</div>
+          <div style="color:var(--mut);font-size:.82em;line-height:1.7;margin-bottom:16px">請確認 Firebase 設定與規則是否正確</div>
+          <button onclick="location.reload()" style="padding:9px 22px;background:linear-gradient(135deg,var(--ora),var(--gold));color:#1a0a00;border:none;border-radius:20px;font-weight:700;cursor:pointer">重試</button>
+        </div>`;
+    }
+  },10000);
+});
+</script>
+</body>
+</html>
