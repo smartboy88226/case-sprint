@@ -311,6 +311,116 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .dsp-dot{width:.55em;height:.55em;border-radius:50%;flex-shrink:0}
 @keyframes dotPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
 .dsp-dot.active{animation:dotPulse 1.5s ease-in-out infinite}
+
+/* ══ 角色卡邊框系統 ══ */
+.scard{position:relative;overflow:visible!important}
+.scard-frame{
+  position:absolute;inset:-6px;border-radius:1.2em;
+  pointer-events:none;z-index:0;overflow:hidden;
+}
+.scard>*:not(.scard-frame){position:relative;z-index:1}
+
+/* 預設無邊框 */
+.frame-none .scard-frame{display:none}
+
+/* ── 金色閃光 ── */
+.frame-gold .scard-frame{
+  background:conic-gradient(from 0deg,#ffd700,#fff8dc,#ffd700,#b8860b,#ffd700);
+  animation:frameSpin 4s linear infinite;
+  padding:3px;border-radius:1.2em;
+}
+.frame-gold .scard-frame::after{
+  content:'';position:absolute;inset:3px;border-radius:1em;
+  background:var(--bg-card,#0d0d1f);
+}
+/* ── 彩虹 ── */
+.frame-rainbow .scard-frame{
+  background:conic-gradient(from 0deg,#ff0080,#ff8c00,#ffe600,#00ff80,#00c8ff,#8000ff,#ff0080);
+  animation:frameSpin 3s linear infinite;padding:3px;
+}
+.frame-rainbow .scard-frame::after{content:'';position:absolute;inset:3px;border-radius:1em;background:#0d0820}
+/* ── 冰雪 ── */
+.frame-ice .scard-frame{
+  background:conic-gradient(from 0deg,#a8edff,#fff,#5bc8ff,#c8f0ff,#a8edff);
+  animation:frameSpin 5s linear infinite;padding:2px;
+}
+.frame-ice .scard-frame::after{content:'';position:absolute;inset:2px;border-radius:1em;background:#060d18}
+/* ── 火焰 ── */
+.frame-fire .scard-frame{
+  background:conic-gradient(from 0deg,#ff4500,#ff8c00,#ffd700,#ff4500,#ff0000,#ff4500);
+  animation:frameSpin 2.5s linear infinite;padding:3px;
+}
+.frame-fire .scard-frame::after{content:'';position:absolute;inset:3px;border-radius:1em;background:#100808}
+/* ── 星空 ── */
+.frame-star .scard-frame{
+  border:2px solid transparent;
+  background:linear-gradient(#0d0820,#0d0820) padding-box,
+             conic-gradient(from 0deg,#8a2be2,#00bfff,#ffd700,#00bfff,#8a2be2) border-box;
+  animation:frameSpin 6s linear infinite;
+}
+/* ── 愛心 ── */
+.frame-heart .scard-frame{
+  background:conic-gradient(from 0deg,#ff69b4,#ff1493,#ff69b4,#ffb6c1,#ff69b4);
+  animation:frameSpin 4s linear infinite;padding:2px;
+}
+.frame-heart .scard-frame::after{content:'';position:absolute;inset:2px;border-radius:1em;background:#160810}
+
+/* ── 柴犬 border ── */
+.frame-shiba .scard-frame{
+  border:3px solid #e8a020;
+  background:repeating-linear-gradient(45deg,
+    transparent,transparent 8px,
+    rgba(232,160,32,.15) 8px,rgba(232,160,32,.15) 16px);
+  border-radius:1.2em;
+  box-shadow:0 0 0 1px #c8800a,inset 0 0 8px rgba(232,160,32,.1);
+}
+.frame-shiba .scard-frame::before{
+  content:'🐕';position:absolute;top:-1em;left:50%;transform:translateX(-50%);
+  font-size:1.2em;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+.frame-shiba .scard-frame::after{display:none}
+
+/* ── 貓咪 border ── */
+.frame-cat .scard-frame{
+  border:3px solid #c080ff;
+  background:repeating-linear-gradient(-45deg,
+    transparent,transparent 10px,
+    rgba(192,128,255,.12) 10px,rgba(192,128,255,.12) 20px);
+  border-radius:1.5em 1.5em 1em 1em;
+  box-shadow:0 0 0 1px #9040dd,inset 0 0 8px rgba(192,128,255,.1);
+}
+.frame-cat .scard-frame::before{
+  content:'🐱';position:absolute;top:-1em;left:50%;transform:translateX(-50%);
+  font-size:1.2em;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+.frame-cat .scard-frame::after{display:none}
+
+/* ── 花花 ── */
+.frame-flower .scard-frame{
+  border:3px solid #ff80ab;
+  border-radius:1.2em;
+  background:transparent;
+  box-shadow:0 0 0 1px #ff4080,0 0 12px rgba(255,128,171,.3);
+  animation:flowerPulse 2s ease-in-out infinite;
+}
+@keyframes flowerPulse{0%,100%{box-shadow:0 0 0 1px #ff4080,0 0 10px rgba(255,128,171,.3)}50%{box-shadow:0 0 0 2px #ff80ab,0 0 20px rgba(255,128,171,.5)}}
+.frame-flower .scard-frame::before{
+  content:'🌸🌸🌸';position:absolute;top:-1.1em;left:50%;transform:translateX(-50%);
+  font-size:.9em;white-space:nowrap;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+.frame-flower .scard-frame::after{display:none}
+
+@keyframes frameSpin{to{transform:rotate(360deg)}}
+
+/* 邊框選擇 modal */
+#frameModal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:700;display:none;align-items:center;justify-content:center;padding:1em}
+#frameModal.on{display:flex}
+.frame-picker{background:#13132a;border:1px solid rgba(255,255,255,.13);border-radius:1.2em;padding:1.4em;max-width:min(400px,94vw);width:100%}
+.frame-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(5.5em,1fr));gap:.7em;margin-top:.9em}
+.frame-opt{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:.7em;padding:.6em .4em;text-align:center;cursor:pointer;transition:all .2s;font-size:.78em}
+.frame-opt:hover{background:rgba(255,255,255,.12);border-color:var(--ora)}
+.frame-opt.selected{border-color:var(--gold);background:rgba(255,215,0,.1)}
+.frame-opt .frame-icon{font-size:1.6em;margin-bottom:.25em}
 </style>
 </head>
 <body>
@@ -529,6 +639,18 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <div style="display:flex;gap:10px;margin-top:14px">
       <button class="btn bg bsm" style="flex:1" onclick="closeProfileModal()">取消</button>
       <button class="btn bm bsm" style="flex:1" onclick="saveProfile()">儲存 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- FRAME PICKER MODAL -->
+<div id="frameModal">
+  <div class="frame-picker">
+    <h3 style="color:var(--ora);margin-bottom:.3em;font-size:.95em">🖼️ 選擇角色卡邊框</h3>
+    <div style="font-size:.75em;color:var(--mut);margin-bottom:.8em">只有你自己看得到自己的設定</div>
+    <div class="frame-options" id="frameOptions"></div>
+    <div style="display:flex;gap:.6em;margin-top:1em">
+      <button class="btn bg bsm" style="flex:1" onclick="document.getElementById('frameModal').classList.remove('on')">關閉</button>
     </div>
   </div>
 </div>
@@ -1107,16 +1229,57 @@ function renderCharmBoard(){
 // STATS + PENTA
 // ════════════════════════════════════════════
 function renderStats(){
-  const pl=Object.values(players).filter(p=>p.empId);const sg=document.getElementById('sgrid');sg.innerHTML='';const maxVals=getAllMax();
+  const pl=Object.values(players).filter(p=>p.empId);
+  const sg=document.getElementById('sgrid');sg.innerHTML='';
+  // 全員授變塗銷總量（跨所有人）
+  let totalSBAll=0,totalTXAll=0;
+  pl.forEach(x=>{const l=(x.logs&&x.logs[YM])||{};Object.values(l).forEach(r=>{totalSBAll+=r.sb||0;totalTXAll+=r.tx||0;});});
+  const myFrame=me?getMyFrame():'none';
   pl.forEach(p=>{
-    const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0,sb=0,tx=0,incoming=0;Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0;incoming+=r.incoming||0});
-    const thr=(p.throwReceived&&p.throwReceived[YM])||0;const prog=Math.round(getProgress(p)*100);const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
-    const card=document.createElement('div');card.className='scard'+(hasAchievedThisMonth(p)?' achieved':'');card.onclick=()=>openPenta(p.empId);
+    const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0,sb=0,tx=0,incoming=0;
+    Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0;incoming+=r.incoming||0});
+    const thr=(p.throwReceived&&p.throwReceived[YM])||0;
+    const prog=Math.round(getProgress(p)*100);
+    const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
+    const isMe=p.empId===me;
+    const frameClass=isMe?`frame-${myFrame}`:'frame-none';
+    const card=document.createElement('div');
+    card.className=`scard ${frameClass}${hasAchievedThisMonth(p)?' achieved':''}`;
+    card.onclick=()=>openPenta(p.empId);
+    // 邊框 div
+    const frameDiv=document.createElement('div');frameDiv.className='scard-frame';
+    card.appendChild(frameDiv);
     const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;gap:11px;margin-bottom:12px';
     const av=makeAvEl(p.avatar,46);av.style.border=`2px solid ${p.color||'#f7971e'}`;
     const info=document.createElement('div');info.innerHTML=`<div style="font-weight:700;font-size:.92em">${p.name} ${medals}</div><div style="font-size:.72em;color:var(--mut)">${p.empId} ｜ 目標${p.target}/日</div><div style="height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin:5px 0 3px"><div style="width:${prog}%;height:100%;background:${p.color||'#f7971e'};border-radius:3px"></div></div><div style="font-size:.7em;color:var(--mut)">進度 ${prog}%</div>`;
     hdr.appendChild(av);hdr.appendChild(info);card.appendChild(hdr);
-    [['結案',ja,'#f7971e',maxVals[0]],['緩議',hy,'#3498db',maxVals[1]],['授變',sb,'#9b59b6',maxVals[2]],['塗銷',tx,'#2ecc71',maxVals[3]],['進件',incoming,'#ffd700',Math.max(1,...Object.values(players).filter(x=>x.empId).map(x=>{const l=(x.logs&&x.logs[YM])||{};let v=0;Object.values(l).forEach(r=>v+=r.incoming||0);return v;}))],['魅力',thr,'#e91e63',maxVals[4]]].forEach(([l,v,c,mx])=>{const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:7px;margin-bottom:5px';row.innerHTML=`<div style="width:36px;font-size:.7em;color:var(--mut);text-align:right;flex-shrink:0">${l}</div><div style="flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden"><div style="width:${Math.round(v/mx*100)}%;height:100%;background:${c};border-radius:3px"></div></div><div style="width:30px;font-size:.7em;color:var(--ora);text-align:right;flex-shrink:0">${v}</div>`;card.appendChild(row);});
+    [    // 進件量大字顯示
+    const incBox=document.createElement('div');
+    incBox.style.cssText='display:flex;align-items:center;justify-content:space-between;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.2);border-radius:.55em;padding:.4em .7em;margin-bottom:.55em';
+    incBox.innerHTML=`<span style="font-size:.72em;color:var(--mut)">📥 本月進件</span><b style="color:var(--gold);font-size:1.05em">${incoming}</b>`;
+    card.appendChild(incBox);
+
+    [['結案',ja,'#f7971e',Math.max(1,...pl.map(x=>{const l=(x.logs&&x.logs[YM])||{};let v=0;Object.values(l).forEach(r=>v+=r.ja||0);return v;}))],
+     ['緩議',hy,'#3498db',Math.max(1,...pl.map(x=>{const l=(x.logs&&x.logs[YM])||{};let v=0;Object.values(l).forEach(r=>v+=r.hy||0);return v;}))],
+     ['授變',sb,'#9b59b6',totalSBAll||1],
+     ['塗銷',tx,'#2ecc71',totalTXAll||1],
+     ['進件',incoming,'#ffd700',Math.max(1,...pl.map(x=>{const l=(x.logs&&x.logs[YM])||{};let v=0;Object.values(l).forEach(r=>v+=r.incoming||0);return v;}))],
+     ['魅力',thr,'#e91e63',Math.max(1,...pl.map(x=>(x.throwReceived&&x.throwReceived[YM])||0))]
+    ].forEach(([l,v,c,mx])=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:.45em;margin-bottom:.32em';
+      row.innerHTML=`<div style="width:2.4em;font-size:.7em;color:var(--mut);text-align:right;flex-shrink:0">${l}</div><div style="flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden"><div style="width:${Math.round(v/mx*100)}%;height:100%;background:${c};border-radius:3px;transition:width .8s"></div></div><div style="width:2em;font-size:.7em;color:var(--ora);text-align:right;flex-shrink:0">${v}</div>`;
+      card.appendChild(row);
+    });
+
+    // 我的邊框選擇按鈕
+    if(isMe){
+      const fbtn=document.createElement('button');
+      fbtn.style.cssText='margin-top:.5em;width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:.5em;color:var(--mut);font-size:.72em;padding:.35em .5em;cursor:pointer;touch-action:manipulation';
+      fbtn.textContent='🖼️ 選擇邊框';
+      fbtn.onclick=(e)=>{e.stopPropagation();openFrameModal();};
+      card.appendChild(fbtn);
+    }
     sg.appendChild(card);
   });
 }
@@ -1124,29 +1287,39 @@ function openPenta(empId){
   const p=players[empId];if(!p)return;
   const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0,sb=0,tx=0,incoming=0;Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0;incoming+=r.incoming||0});
   const charm=(p.throwReceived&&p.throwReceived[YM])||0;
-  // ── 五邊形 5軸：結案/緩議/授變/塗銷/魅力 ──
-  // 評分用 百分位 (percentile rank) — 最公平：你排第幾名
   const pl2=Object.values(players).filter(x=>x.empId);
-  function getVal(player,key){
+
+  // 結案/緩議/魅力：百分位排名（相對排名）
+  function getVal2(player,key){
     const l=(player.logs&&player.logs[YM])||{};
     if(key==='charm') return (player.throwReceived&&player.throwReceived[YM])||0;
     let v=0;Object.values(l).forEach(r=>v+=r[key]||0);return v;
   }
-  function percentile(myVal,key){
-    const allVals=pl2.map(x=>getVal(x,key));
-    const below=allVals.filter(v=>v<myVal).length;
-    const equal=allVals.filter(v=>v===myVal).length;
-    // Percentile: (below + 0.5*equal) / total → 0~1
-    const n=allVals.length;
-    if(n===1) return myVal>0?1:0;
+  function pctRank(myVal,key){
+    const all=pl2.map(x=>getVal2(x,key));
+    const n=all.length;if(n===1)return myVal>0?1:0;
+    const below=all.filter(v=>v<myVal).length;
+    const equal=all.filter(v=>v===myVal).length;
     return (below+equal*.5)/n;
   }
+
+  // 授變/塗銷：個人佔全員總量的比例（貢獻度）
+  let totalSBPenta=0,totalTXPenta=0;
+  pl2.forEach(x=>{const l=(x.logs&&x.logs[YM])||{};Object.values(l).forEach(r=>{totalSBPenta+=r.sb||0;totalTXPenta+=r.tx||0;});});
+  const sbShare=totalSBPenta>0?sb/totalSBPenta:0;
+  const txShare=totalTXPenta>0?tx/totalTXPenta:0;
+
+  // 進件量：個人進件/個人目標（達成率）
+  const incTarget=Math.max(1,getIncomingTarget(p));
+  const incRate=Math.min(1,incoming/incTarget);
+
+  // 五邊形 5軸：結案百分位 / 緩議百分位 / 授變貢獻 / 塗銷貢獻 / 魅力百分位
   const vals=[
-    percentile(ja,'ja'),
-    percentile(hy,'hy'),
-    percentile(sb,'sb'),
-    percentile(tx,'tx'),
-    percentile(charm,'charm'),
+    pctRank(ja,'ja'),
+    pctRank(hy,'hy'),
+    sbShare,
+    txShare,
+    pctRank(charm,'charm'),
   ];
   const maxVals=[1,1,1,1,1];
   const pmAv=document.getElementById('pm-av');if(p.avatar)pmAv.innerHTML=`<img src="${p.avatar}" alt="av">`;else pmAv.textContent='👤';
@@ -1161,12 +1334,16 @@ function openPenta(empId){
   for(let i=0;i<5;i++){const a=(Math.PI*2/5)*i-Math.PI/2;ctx.beginPath();ctx.moveTo(cx2,cy2);ctx.lineTo(cx2+r*Math.cos(a),cy2+r*Math.sin(a));ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=.5;ctx.stroke();}
   ctx.beginPath();vals.forEach((v,i)=>{const norm=v/maxVals[i];const a=(Math.PI*2/5)*i-Math.PI/2;const x=cx2+r*norm*Math.cos(a),y=cy2+r*norm*Math.sin(a);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.closePath();ctx.fillStyle=(p.color||'#f7971e')+'33';ctx.fill();ctx.strokeStyle=p.color||'#f7971e';ctx.lineWidth=2;ctx.stroke();
   vals.forEach((v,i)=>{const norm=v/maxVals[i];const a=(Math.PI*2/5)*i-Math.PI/2;ctx.beginPath();ctx.arc(cx2+r*norm*Math.cos(a),cy2+r*norm*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle=cols[i];ctx.fill();const lx=cx2+(r+sz*.09)*Math.cos(a),ly=cy2+(r+sz*.09)*Math.sin(a);ctx.fillStyle='#fff';ctx.font=`bold ${sz*.052}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lbls[i],lx,ly);});
+  const rawVals=[ja,hy,sb,tx,charm];
+  const valLabels=[
+    `${ja}件 排名${Math.round(vals[0]*100)}%`,
+    `${hy}件 排名${Math.round(vals[1]*100)}%`,
+    `${sb}件 佔${Math.round(vals[2]*100)}%`,
+    `${tx}件 佔${Math.round(vals[3]*100)}%`,
+    `${charm}票 排名${Math.round(vals[4]*100)}%`,
+  ];
   document.getElementById('pmlabels').innerHTML=
-    lbls.map((l,i,a)=>{
-      const raw=[ja,hy,sb,tx,charm][i];
-      const pct=Math.round(vals[i]*100);
-      return`<span style="color:${cols[i]}">${l}:<b>${raw}</b><span style="font-size:.8em;color:rgba(255,255,255,.4)">(${pct}%)</span></span>`;
-    }).join('');
+    lbls.map((l,i)=>`<span style="color:${cols[i]}">${l}:<b style="font-size:.85em">${valLabels[i]}</b></span>`).join('');
 }
 
 // ════════════════════════════════════════════
@@ -1354,6 +1531,125 @@ function showWarriorCelebration(){
   setTimeout(()=>overlay.style.display='none',6000);
   overlay.onclick=()=>overlay.style.display='none';
 }
+
+
+
+// ══ 邊框系統 ══
+const FRAMES=[
+  {id:'none',name:'無',icon:'⬜'},
+  {id:'gold',name:'金光',icon:'✨'},
+  {id:'rainbow',name:'彩虹',icon:'🌈'},
+  {id:'fire',name:'火焰',icon:'🔥'},
+  {id:'ice',name:'冰雪',icon:'❄️'},
+  {id:'star',name:'星空',icon:'⭐'},
+  {id:'heart',name:'愛心',icon:'💖'},
+  {id:'shiba',name:'柴犬',icon:'🐕'},
+  {id:'cat',name:'貓咪',icon:'🐱'},
+  {id:'flower',name:'花花',icon:'🌸'},
+];
+function getMyFrame(){
+  return localStorage.getItem('frame_'+me)||'none';
+}
+function setMyFrame(id){
+  localStorage.setItem('frame_'+me,id);
+  renderStats();
+}
+function openFrameModal(){
+  const cur=getMyFrame();
+  const opts=document.getElementById('frameOptions');
+  opts.innerHTML=FRAMES.map(f=>`
+    <div class="frame-opt ${f.id===cur?'selected':''}" onclick="setMyFrame('${f.id}');renderFrameOptions()">
+      <div class="frame-icon">${f.icon}</div>
+      <div>${f.name}</div>
+    </div>`).join('');
+  document.getElementById('frameModal').classList.add('on');
+}
+function renderFrameOptions(){
+  const cur=getMyFrame();
+  document.querySelectorAll('.frame-opt').forEach((el,i)=>{
+    el.classList.toggle('selected',FRAMES[i].id===cur);
+  });
+  renderStats();
+}
+
+// ════════════════════════════════════════════
+// TAB SWITCH
+// ════════════════════════════════════════════
+function switchTab(tab){
+  const names=['home','daily','stats','lb','titles','vote'];
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('on',names[i]===tab));
+  document.querySelectorAll('.pane').forEach(el=>el.classList.remove('on'));
+  document.getElementById('p-'+tab).classList.add('on');
+  if(tab==='home'){renderKingBanner();renderDailyStatsPanel();renderPlayersGrid();renderCharmBoard();renderTitlesRow();}
+  if(tab==='daily')renderDaily();
+  if(tab==='stats')renderStats();
+  if(tab==='lb')renderLB();
+  if(tab==='titles')renderTitles();
+  if(tab==='vote')renderVoteTab();
+  updateTopbarProg();
+}
+function refreshCurrentTab(){
+  const on=document.querySelector('.tab.on');if(!on)return;
+  const names=['home','daily','stats','lb','titles','vote'];
+  const idx2=Array.from(document.querySelectorAll('.tab')).indexOf(on);
+  if(idx2>=0)switchTab(names[idx2]);
+  updateTopbarBadge();
+}
+
+// ════════════════════════════════════════════
+// FILL DATE (補打)
+// ════════════════════════════════════════════
+function fillDate(d){
+  const p=players[me];if(!p)return;
+  const logs=(p.logs&&p.logs[YM])||{};const r=logs[d]||{};
+  document.getElementById('ija').value=r.ja||0;
+  document.getElementById('ihy').value=r.hy||0;
+  document.getElementById('isb').value=r.sb||0;
+  document.getElementById('itx').value=r.tx||0;
+  document.getElementById('iincoming').value=r.incoming||0;
+  document.getElementById('ileave').value=r.leave||0;
+  document.getElementById('iot').value=r.ot||0;
+  window._editingDate=d;
+  const btn=document.querySelector('[onclick="submitDaily()"]');
+  const ed=document.getElementById('editingDate');
+  if(d===TODAY){
+    if(btn){btn.textContent='儲存今日記錄 ✓';btn.style.background='';}
+    if(ed)ed.textContent='';
+  }else{
+    if(btn){btn.textContent=`📝 補打 ${d.slice(5)} ✓`;btn.style.background='linear-gradient(135deg,#9b59b6,#6c3483)';}
+    if(ed)ed.innerHTML=`<span style="color:#bb88ff">🖊️ 正在補打 ${d}　<span onclick="fillDate('${TODAY}')" style="cursor:pointer;color:var(--mut);text-decoration:underline">回到今日</span></span>`;
+  }
+  updDW();
+  document.getElementById('p-daily').scrollTop=0;
+}
+
+// ════════════════════════════════════════════
+// RENDER LOG
+// ════════════════════════════════════════════
+function renderLog(){
+  const p=players[me];if(!p)return;
+  const logs=(p.logs&&p.logs[YM])||{};
+  const wd=getWDSF(today.getFullYear(),today.getMonth()+1);
+  document.getElementById('logbody').innerHTML=wd.slice().reverse().map(d=>{
+    const r=logs[d];const isToday=d===TODAY;
+    const rowBg=isToday?'background:rgba(247,151,30,.08)':'';
+    if(!r)return`<tr style="${rowBg};cursor:pointer" onclick="fillDate('${d}')"><td style="color:var(--mut)">${d.slice(5)} <span style="font-size:.68em;color:#9b59b6">補打</span></td><td colspan="8" style="color:rgba(255,255,255,.2)">—</td></tr>`;
+    return`<tr style="${rowBg};cursor:pointer" onclick="fillDate('${d}')"><td style="${isToday?'color:var(--ora);font-weight:700':''}">${d.slice(5)}${isToday?' 🔵':''}</td><td>${r.ja||0}</td><td>${r.hy||0}</td><td>${r.sb||0}</td><td>${r.tx||0}</td><td>${r.incoming||0}</td><td>${r.leave||0}</td><td>${r.ot||0}</td><td style="color:var(--ora);font-weight:700">${cW(r).toFixed(1)}</td></tr>`;
+  }).join('');
+  const total=getMonthTotal(p);
+  const leavD=(getTotalLeaveHours(p)/8).toFixed(2);
+  const otD=(getTotalOTHours(p)/8).toFixed(2);
+  const wdays=getWD(today.getFullYear(),today.getMonth()+1);
+  const lastWD=wdays[wdays.length-1];
+  const incomingTot=getMonthIncoming(p);
+  const incomingTgt=getIncomingTarget(p).toFixed(0);
+  const isLastWD=TODAY>=lastWD;
+  const incomingStr=isLastWD
+    ?`｜進件 ${incomingTot}/${incomingTgt} ${incomingTot>=getIncomingTarget(p)?'✅':'⚠️'}`
+    :`｜進件累計 ${incomingTot}（月底結算）`;
+  document.getElementById('logsum').innerHTML=`加權累計 <b style="color:var(--gold)">${total.toFixed(1)}</b> ／ 目標 <b>${getAdjTarget(p).toFixed(0)}</b>（假 ${leavD}天 班 ${otD}天）｜ <b style="color:var(--ora)">${Math.round(getProgress(p)*100)}%</b>${incomingStr}`;
+}
+
 
 
 // ════════════════════════════════════════════
