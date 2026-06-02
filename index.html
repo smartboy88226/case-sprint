@@ -311,116 +311,6 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .dsp-dot{width:.55em;height:.55em;border-radius:50%;flex-shrink:0}
 @keyframes dotPulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
 .dsp-dot.active{animation:dotPulse 1.5s ease-in-out infinite}
-
-/* ══ 角色卡邊框系統 ══ */
-.scard{position:relative;overflow:visible!important}
-.scard-frame{
-  position:absolute;inset:-6px;border-radius:1.2em;
-  pointer-events:none;z-index:0;overflow:hidden;
-}
-.scard>*:not(.scard-frame){position:relative;z-index:1}
-
-/* 預設無邊框 */
-.frame-none .scard-frame{display:none}
-
-/* ── 金色閃光 ── */
-.frame-gold .scard-frame{
-  background:conic-gradient(from 0deg,#ffd700,#fff8dc,#ffd700,#b8860b,#ffd700);
-  animation:frameSpin 4s linear infinite;
-  padding:3px;border-radius:1.2em;
-}
-.frame-gold .scard-frame::after{
-  content:'';position:absolute;inset:3px;border-radius:1em;
-  background:var(--bg-card,#0d0d1f);
-}
-/* ── 彩虹 ── */
-.frame-rainbow .scard-frame{
-  background:conic-gradient(from 0deg,#ff0080,#ff8c00,#ffe600,#00ff80,#00c8ff,#8000ff,#ff0080);
-  animation:frameSpin 3s linear infinite;padding:3px;
-}
-.frame-rainbow .scard-frame::after{content:'';position:absolute;inset:3px;border-radius:1em;background:#0d0820}
-/* ── 冰雪 ── */
-.frame-ice .scard-frame{
-  background:conic-gradient(from 0deg,#a8edff,#fff,#5bc8ff,#c8f0ff,#a8edff);
-  animation:frameSpin 5s linear infinite;padding:2px;
-}
-.frame-ice .scard-frame::after{content:'';position:absolute;inset:2px;border-radius:1em;background:#060d18}
-/* ── 火焰 ── */
-.frame-fire .scard-frame{
-  background:conic-gradient(from 0deg,#ff4500,#ff8c00,#ffd700,#ff4500,#ff0000,#ff4500);
-  animation:frameSpin 2.5s linear infinite;padding:3px;
-}
-.frame-fire .scard-frame::after{content:'';position:absolute;inset:3px;border-radius:1em;background:#100808}
-/* ── 星空 ── */
-.frame-star .scard-frame{
-  border:2px solid transparent;
-  background:linear-gradient(#0d0820,#0d0820) padding-box,
-             conic-gradient(from 0deg,#8a2be2,#00bfff,#ffd700,#00bfff,#8a2be2) border-box;
-  animation:frameSpin 6s linear infinite;
-}
-/* ── 愛心 ── */
-.frame-heart .scard-frame{
-  background:conic-gradient(from 0deg,#ff69b4,#ff1493,#ff69b4,#ffb6c1,#ff69b4);
-  animation:frameSpin 4s linear infinite;padding:2px;
-}
-.frame-heart .scard-frame::after{content:'';position:absolute;inset:2px;border-radius:1em;background:#160810}
-
-/* ── 柴犬 border ── */
-.frame-shiba .scard-frame{
-  border:3px solid #e8a020;
-  background:repeating-linear-gradient(45deg,
-    transparent,transparent 8px,
-    rgba(232,160,32,.15) 8px,rgba(232,160,32,.15) 16px);
-  border-radius:1.2em;
-  box-shadow:0 0 0 1px #c8800a,inset 0 0 8px rgba(232,160,32,.1);
-}
-.frame-shiba .scard-frame::before{
-  content:'🐕';position:absolute;top:-1em;left:50%;transform:translateX(-50%);
-  font-size:1.2em;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
-}
-.frame-shiba .scard-frame::after{display:none}
-
-/* ── 貓咪 border ── */
-.frame-cat .scard-frame{
-  border:3px solid #c080ff;
-  background:repeating-linear-gradient(-45deg,
-    transparent,transparent 10px,
-    rgba(192,128,255,.12) 10px,rgba(192,128,255,.12) 20px);
-  border-radius:1.5em 1.5em 1em 1em;
-  box-shadow:0 0 0 1px #9040dd,inset 0 0 8px rgba(192,128,255,.1);
-}
-.frame-cat .scard-frame::before{
-  content:'🐱';position:absolute;top:-1em;left:50%;transform:translateX(-50%);
-  font-size:1.2em;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
-}
-.frame-cat .scard-frame::after{display:none}
-
-/* ── 花花 ── */
-.frame-flower .scard-frame{
-  border:3px solid #ff80ab;
-  border-radius:1.2em;
-  background:transparent;
-  box-shadow:0 0 0 1px #ff4080,0 0 12px rgba(255,128,171,.3);
-  animation:flowerPulse 2s ease-in-out infinite;
-}
-@keyframes flowerPulse{0%,100%{box-shadow:0 0 0 1px #ff4080,0 0 10px rgba(255,128,171,.3)}50%{box-shadow:0 0 0 2px #ff80ab,0 0 20px rgba(255,128,171,.5)}}
-.frame-flower .scard-frame::before{
-  content:'🌸🌸🌸';position:absolute;top:-1.1em;left:50%;transform:translateX(-50%);
-  font-size:.9em;white-space:nowrap;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
-}
-.frame-flower .scard-frame::after{display:none}
-
-@keyframes frameSpin{to{transform:rotate(360deg)}}
-
-/* 邊框選擇 modal */
-#frameModal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:700;display:none;align-items:center;justify-content:center;padding:1em}
-#frameModal.on{display:flex}
-.frame-picker{background:#13132a;border:1px solid rgba(255,255,255,.13);border-radius:1.2em;padding:1.4em;max-width:min(400px,94vw);width:100%}
-.frame-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(5.5em,1fr));gap:.7em;margin-top:.9em}
-.frame-opt{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:.7em;padding:.6em .4em;text-align:center;cursor:pointer;transition:all .2s;font-size:.78em}
-.frame-opt:hover{background:rgba(255,255,255,.12);border-color:var(--ora)}
-.frame-opt.selected{border-color:var(--gold);background:rgba(255,215,0,.1)}
-.frame-opt .frame-icon{font-size:1.6em;margin-bottom:.25em}
 </style>
 </head>
 <body>
@@ -639,18 +529,6 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <div style="display:flex;gap:10px;margin-top:14px">
       <button class="btn bg bsm" style="flex:1" onclick="closeProfileModal()">取消</button>
       <button class="btn bm bsm" style="flex:1" onclick="saveProfile()">儲存 ✓</button>
-    </div>
-  </div>
-</div>
-
-<!-- FRAME PICKER MODAL -->
-<div id="frameModal">
-  <div class="frame-picker">
-    <h3 style="color:var(--ora);margin-bottom:.3em;font-size:.95em">🖼️ 選擇角色卡邊框</h3>
-    <div style="font-size:.75em;color:var(--mut);margin-bottom:.8em">只有你自己看得到自己的設定</div>
-    <div class="frame-options" id="frameOptions"></div>
-    <div style="display:flex;gap:.6em;margin-top:1em">
-      <button class="btn bg bsm" style="flex:1" onclick="document.getElementById('frameModal').classList.remove('on')">關閉</button>
     </div>
   </div>
 </div>
@@ -1234,7 +1112,7 @@ function renderStats(){
   // 全員授變塗銷總量（跨所有人）
   let totalSBAll=0,totalTXAll=0;
   pl.forEach(x=>{const l=(x.logs&&x.logs[YM])||{};Object.values(l).forEach(r=>{totalSBAll+=r.sb||0;totalTXAll+=r.tx||0;});});
-  const myFrame=me?getMyFrame():'none';
+
   pl.forEach(p=>{
     const logs=(p.logs&&p.logs[YM])||{};let ja=0,hy=0,sb=0,tx=0,incoming=0;
     Object.values(logs).forEach(r=>{ja+=r.ja||0;hy+=r.hy||0;sb+=r.sb||0;tx+=r.tx||0;incoming+=r.incoming||0});
@@ -1242,18 +1120,14 @@ function renderStats(){
     const prog=Math.round(getProgress(p)*100);
     const medals=(p.medals||[]).map(m=>m==='gold'?'🥇':m==='silver'?'🥈':'🥉').join('');
     const isMe=p.empId===me;
-    const frameClass=isMe?`frame-${myFrame}`:'frame-none';
     const card=document.createElement('div');
-    card.className=`scard ${frameClass}${hasAchievedThisMonth(p)?' achieved':''}`;
+    card.className=`scard${hasAchievedThisMonth(p)?' achieved':''}`;
     card.onclick=()=>openPenta(p.empId);
-    // 邊框 div
-    const frameDiv=document.createElement('div');frameDiv.className='scard-frame';
-    card.appendChild(frameDiv);
     const hdr=document.createElement('div');hdr.style.cssText='display:flex;align-items:center;gap:11px;margin-bottom:12px';
     const av=makeAvEl(p.avatar,46);av.style.border=`2px solid ${p.color||'#f7971e'}`;
     const info=document.createElement('div');info.innerHTML=`<div style="font-weight:700;font-size:.92em">${p.name} ${medals}</div><div style="font-size:.72em;color:var(--mut)">${p.empId} ｜ 目標${p.target}/日</div><div style="height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin:5px 0 3px"><div style="width:${prog}%;height:100%;background:${p.color||'#f7971e'};border-radius:3px"></div></div><div style="font-size:.7em;color:var(--mut)">進度 ${prog}%</div>`;
     hdr.appendChild(av);hdr.appendChild(info);card.appendChild(hdr);
-    [    // 進件量大字顯示
+    // 進件量大字顯示
     const incBox=document.createElement('div');
     incBox.style.cssText='display:flex;align-items:center;justify-content:space-between;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.2);border-radius:.55em;padding:.4em .7em;margin-bottom:.55em';
     incBox.innerHTML=`<span style="font-size:.72em;color:var(--mut)">📥 本月進件</span><b style="color:var(--gold);font-size:1.05em">${incoming}</b>`;
@@ -1272,14 +1146,7 @@ function renderStats(){
       card.appendChild(row);
     });
 
-    // 我的邊框選擇按鈕
-    if(isMe){
-      const fbtn=document.createElement('button');
-      fbtn.style.cssText='margin-top:.5em;width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:.5em;color:var(--mut);font-size:.72em;padding:.35em .5em;cursor:pointer;touch-action:manipulation';
-      fbtn.textContent='🖼️ 選擇邊框';
-      fbtn.onclick=(e)=>{e.stopPropagation();openFrameModal();};
-      card.appendChild(fbtn);
-    }
+
     sg.appendChild(card);
   });
 }
@@ -1533,44 +1400,6 @@ function showWarriorCelebration(){
 }
 
 
-
-// ══ 邊框系統 ══
-const FRAMES=[
-  {id:'none',name:'無',icon:'⬜'},
-  {id:'gold',name:'金光',icon:'✨'},
-  {id:'rainbow',name:'彩虹',icon:'🌈'},
-  {id:'fire',name:'火焰',icon:'🔥'},
-  {id:'ice',name:'冰雪',icon:'❄️'},
-  {id:'star',name:'星空',icon:'⭐'},
-  {id:'heart',name:'愛心',icon:'💖'},
-  {id:'shiba',name:'柴犬',icon:'🐕'},
-  {id:'cat',name:'貓咪',icon:'🐱'},
-  {id:'flower',name:'花花',icon:'🌸'},
-];
-function getMyFrame(){
-  return localStorage.getItem('frame_'+me)||'none';
-}
-function setMyFrame(id){
-  localStorage.setItem('frame_'+me,id);
-  renderStats();
-}
-function openFrameModal(){
-  const cur=getMyFrame();
-  const opts=document.getElementById('frameOptions');
-  opts.innerHTML=FRAMES.map(f=>`
-    <div class="frame-opt ${f.id===cur?'selected':''}" onclick="setMyFrame('${f.id}');renderFrameOptions()">
-      <div class="frame-icon">${f.icon}</div>
-      <div>${f.name}</div>
-    </div>`).join('');
-  document.getElementById('frameModal').classList.add('on');
-}
-function renderFrameOptions(){
-  const cur=getMyFrame();
-  document.querySelectorAll('.frame-opt').forEach((el,i)=>{
-    el.classList.toggle('selected',FRAMES[i].id===cur);
-  });
-  renderStats();
-}
 
 // ════════════════════════════════════════════
 // TAB SWITCH
